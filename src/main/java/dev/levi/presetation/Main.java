@@ -1,5 +1,8 @@
 package dev.levi.presetation;
 
+import dev.levi.data.FileDao;
+import dev.levi.data.FileDaoImpl;
+import dev.levi.domain.Files;
 import org.apache.commons.io.IOUtils;
 import org.netbeans.api.java.lexer.JavaTokenId;
 import org.netbeans.api.java.source.ui.DialogBinding;
@@ -24,7 +27,13 @@ public class Main {
       //  App app = App.getInstance();
     //  doSyntaxColoring("./App.java");
        // completion();
-connectH2();
+        FileDao dao = new FileDaoImpl();
+        dao.createFile(new Files(0,"sample.txt","/home/login",System.currentTimeMillis()));
+        dao.createFile(new Files(0,"sample.txt","/home/login",System.currentTimeMillis()));
+        dao.createFile(new Files(0,"sample.txt","/home/login",System.currentTimeMillis()));
+        dao.createFile(new Files(0,"sample.txt","/home/login",System.currentTimeMillis()));
+        dao.createFile(new Files(0,"sample.txt","/home/login",System.currentTimeMillis()));
+       dao.findAllFiles().forEach(System.out::println);
         EditorFrame frame = new EditorFrame();
     }
     public static void doSyntaxColoring(String fileName) {
@@ -115,25 +124,25 @@ connectH2();
 
     }
 
-    public static void connectH2(){
-        try {
-            Connection conn = DriverManager.getConnection ("jdbc:h2:./src/main/resources/db", "sa","");
-            Statement stmt = null;
-            stmt = conn.createStatement();
-            String sql =  "CREATE  TABLE IF NOT EXISTS PREVIOUSFILES" +
-                    "id INTEGER IDENTITY not NULL, " +
-                    " name VARCHAR(255) NOT NULL, " +
-                    " path VARCHAR(255) NOT NULL, " +
-                    " time LONG NOT NULL, " +
-                    " PRIMARY KEY ( id ))";
-            stmt.executeUpdate(sql);
-            System.out.println("Created table in given database...");
-
-            // STEP 4: Clean-up environment
-            stmt.close();
-            conn.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    public static void connectH2(){
+//        try {
+//            Connection conn = DriverManager.getConnection ("jdbc:h2:./src/main/resources/db", "sa","");
+//            Statement stmt = null;
+//            stmt = conn.createStatement();
+//            String sql =  "CREATE  TABLE IF NOT EXISTS FILES" +
+//                    "id INTEGER IDENTITY not NULL, " +
+//                    " name VARCHAR(255) NOT NULL, " +
+//                    " path VARCHAR(255) NOT NULL, " +
+//                    " time LONG NOT NULL, " +
+//                    " PRIMARY KEY ( id ))";
+//            stmt.executeUpdate(sql);
+//            System.out.println("Created table in given database...");
+//
+//            // STEP 4: Clean-up environment
+//            stmt.close();
+//            conn.close();
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 }
