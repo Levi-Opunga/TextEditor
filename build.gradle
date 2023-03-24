@@ -20,6 +20,7 @@ dependencies {
 
     implementation 'org.netbeans.modules:org-netbeans-modules-java-editor:RELEASE123'
     implementation 'org.netbeans.modules:org-netbeans-modules-editor-mimelookup-impl:RELEASE123'
+    implementation 'com.h2database:h2:2.1.214'
 
     implementation 'org.apache.commons:commons-lang3:3.10'
     implementation 'commons-io:commons-io:2.8.0'

@@ -1,4 +1,4 @@
-package dev.levi;
+package dev.levi.presetation;
 
 import javax.swing.*;
 import javax.swing.text.html.HTMLDocument;

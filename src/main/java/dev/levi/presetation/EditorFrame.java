@@ -1,4 +1,4 @@
-package dev.levi;
+package dev.levi.presetation;
 
 import org.apache.commons.io.IOUtils;
 import org.netbeans.api.java.lexer.JavaTokenId;
@@ -12,12 +12,8 @@ import javax.swing.text.EditorKit;
 import javax.swing.text.StyledDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.event.*;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.util.Arrays;
 
 public class EditorFrame extends JFrame {
@@ -39,6 +35,7 @@ public class EditorFrame extends JFrame {
 
 
     private JScrollPane scrollPane;
+    private boolean previewHtml = false;
 
 
     public EditorFrame getInstance() throws IOException {
@@ -52,7 +49,7 @@ public class EditorFrame extends JFrame {
 
     public EditorFrame(String fileName) throws HeadlessException, IOException {
         this.fileName = fileName;
-        System.out.println("df6 "+fileName);
+        System.out.println("df6 " + fileName);
         initializeView(fileName);
         resizeEvent();
     }
@@ -75,13 +72,13 @@ public class EditorFrame extends JFrame {
         //pane.setEditorKit(kit);
 
         File file = new File(fileName == "" || fileName == null ? "./error.html" : fileName);
-        if(fileName=="000000"){
+        if (fileName == "000000") {
             file = new File("./landing.html");
         }
         System.out.println(fileName);
         try {
             pane.setPage(file.toURI().toURL());
-            fileName =file.toURI().toURL().toString();
+            fileName = file.toURI().toURL().toString();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -175,8 +172,35 @@ public class EditorFrame extends JFrame {
         JMenuItem openExistingFile = new JMenuItem("Open file");
         JMenuItem openRecentFile = new JMenuItem("Recent Files");
         JMenuItem saveFile = new JMenuItem("Save");
-newFile.addActionListener(e->new DemoJFileChooser().chooseDirectory()
-);
+        Action saveAction = new AbstractAction("Save") {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    File file = new File(fileName);
+                    FileWriter fr = new FileWriter(file);
+                    fr.write(pane.getText());
+                    fr.close();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        };
+
+        saveAction.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S);
+        saveFile.setAction(saveAction);
+
+
+        String key = "Referesh";
+
+
+        saveFile.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK), key);
+
+        saveFile.getActionMap().put(key, saveAction);
+
+        newFile.addActionListener(e -> new FileCreator().chooseDirectory()
+        );
 
         JMenuItem htmlPreview = new JMenuItem("Preview Html");
         htmlPreview.addActionListener(
@@ -250,13 +274,25 @@ newFile.addActionListener(e->new DemoJFileChooser().chooseDirectory()
     }
 
     private void htmlPreview() throws IOException {
-      if(fileName.contains("html")||fileName.contains("htm")){  pane.setContentType("text/html");
-        HTMLEditorKit editorKit = new HTMLEditorKit();
-        pane.setEditorKit(editorKit);
+        if (previewHtml == false) {
+            if (fileName.contains("html") || fileName.contains("htm")) {
+                pane.setContentType("text/html");
+                HTMLEditorKit editorKit = new HTMLEditorKit();
+                pane.setEditorKit(editorKit);
 
-        File file = new File(fileName);
-        pane.setPage(file.toURI().toURL());
-        pane.setEditable(true);}
+                File file = new File(fileName);
+                pane.setPage(file.toURI().toURL());
+                pane.setEditable(false);
+                previewHtml=!previewHtml;
+            }
+        } else {
+            pane.setContentType("text/plain");
+            previewHtml=!previewHtml;
+            File file = new File(fileName);
+            FileReader reader = new FileReader(file);
+            pane.setText(IOUtils.toString(reader));
+            pane.setEditable(true);
+        }
     }
 
     private void javaPresent(String javaFile) {

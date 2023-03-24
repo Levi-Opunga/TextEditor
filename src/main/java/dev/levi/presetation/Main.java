@@ -1,11 +1,9 @@
-package dev.levi;
+package dev.levi.presetation;
 
 import org.apache.commons.io.IOUtils;
 import org.netbeans.api.java.lexer.JavaTokenId;
 import org.netbeans.api.java.source.ui.DialogBinding;
 import org.netbeans.api.lexer.Language;
-import org.netbeans.modules.editor.java.JavaKit;
-import org.netbeans.modules.refactoring.spi.ui.ScopePanel;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
@@ -16,12 +14,17 @@ import javax.swing.text.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class Main {
     public static void main(String[] args) throws IOException {
       //  App app = App.getInstance();
     //  doSyntaxColoring("./App.java");
        // completion();
+connectH2();
         EditorFrame frame = new EditorFrame();
     }
     public static void doSyntaxColoring(String fileName) {
@@ -110,5 +113,27 @@ public class Main {
         frame.add(editorPane);
         frame.setVisible(true);
 
+    }
+
+    public static void connectH2(){
+        try {
+            Connection conn = DriverManager.getConnection ("jdbc:h2:./src/main/resources/db", "sa","");
+            Statement stmt = null;
+            stmt = conn.createStatement();
+            String sql =  "CREATE  TABLE IF NOT EXISTS PREVIOUSFILES" +
+                    "id INTEGER IDENTITY not NULL, " +
+                    " name VARCHAR(255) NOT NULL, " +
+                    " path VARCHAR(255) NOT NULL, " +
+                    " time LONG NOT NULL, " +
+                    " PRIMARY KEY ( id ))";
+            stmt.executeUpdate(sql);
+            System.out.println("Created table in given database...");
+
+            // STEP 4: Clean-up environment
+            stmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

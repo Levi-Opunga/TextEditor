@@ -1,13 +1,14 @@
-package dev.levi;
+package dev.levi.presetation;
 
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 
-public class DemoJFileChooser extends JPanel
+public class FileCreator extends JPanel
         implements ActionListener {
     JButton go;
     JLabel directoryLabel =new JLabel("Select folder to create");
@@ -21,7 +22,7 @@ public class DemoJFileChooser extends JPanel
     JButton saveButton =new JButton("save");
 
 
-    public DemoJFileChooser() {
+    public FileCreator() {
         setLayout(null);
         go = new JButton("...");
         go.setBackground(Color.white);
@@ -43,7 +44,25 @@ if(directory!=""&&filename.getText().length()>1){
     } catch (IOException ex) {
         throw new RuntimeException(ex);
     }
-    System.out.println(directory);
+    if(directory.contains("html")){
+        try {
+            FileWriter writer = new FileWriter(directory);
+            writer.write("<!DOCTYPE html>\n" +
+                    "<html lang=\"en\">\n" +
+                    "<head>\n" +
+                    "    <meta charset=\"UTF-8\">\n" +
+                    "    <title>Title</title>\n" +
+                    "</head>\n" +
+                    "<body>\n" +
+                    "<h1 style=\"color:#0046b2;align-content: center\">Hello World</h1>\n" +
+                    "</body>\n" +
+                    "</html>");
+            writer.close();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     try {
         new EditorFrame(directory);
     } catch (IOException ex) {
@@ -87,19 +106,13 @@ if(directory!=""&&filename.getText().length()>1){
     }
 
     public Dimension getPreferredSize(){
-        return new Dimension(400, 400);
+        return new Dimension(400, 200);
     }
 
     public void chooseDirectory() {
         JFrame frame = new JFrame("");
-        DemoJFileChooser panel = new DemoJFileChooser();
-        frame.addWindowListener(
-                new WindowAdapter() {
-                    public void windowClosing(WindowEvent e) {
-                        System.exit(0);
-                    }
-                }
-        );
+        FileCreator panel = new FileCreator();
+        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.getContentPane().add(panel,"Center");
         frame.setSize(panel.getPreferredSize());
         frame.setVisible(true);
