@@ -1,20 +1,29 @@
 package dev.levi.presetation;
 
+import dev.levi.presetation.components.FileTree;
 import org.apache.commons.io.IOUtils;
+import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.netbeans.api.java.lexer.JavaTokenId;
 import org.netbeans.api.lexer.Language;
 import org.openide.text.CloneableEditorSupport;
 
 import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.EditorKit;
 import javax.swing.text.StyledDocument;
 import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.Arrays;
+
+import static dev.levi.presetation.Main.generateFonts;
 
 public class EditorFrame extends JFrame {
 
@@ -26,16 +35,20 @@ public class EditorFrame extends JFrame {
     private JMenu edit = new JMenu();
     private JMenu help = new JMenu();
     private JMenu viewMenu = new JMenu();
-    private JPanel secondPanel = new JPanel();
     private String fileName = "000000";
 
     private JEditorPane pane = new JEditorPane();
 
-    private JScrollPane comp = null;
+    private JScrollPane main = null;
+    private JScrollPane sidebar = null;
 
 
     private JScrollPane scrollPane;
     private boolean previewHtml = false;
+    private FileTree fileTree;
+
+    RSyntaxTextArea textArea = new RSyntaxTextArea();
+    RSyntaxDocument document = (RSyntaxDocument)textArea.getDocument();
 
 
     public EditorFrame getInstance() throws IOException {
@@ -44,6 +57,9 @@ public class EditorFrame extends JFrame {
         } else {
             return instance;
         }
+
+    }
+    {
 
     }
 
@@ -63,6 +79,8 @@ public class EditorFrame extends JFrame {
 
     public void initializeView(String fileName) throws IOException {
 
+
+
         StyledDocument doc = new DefaultStyledDocument();
         doc.putProperty(Language.class, JavaTokenId.language());
 
@@ -74,8 +92,11 @@ public class EditorFrame extends JFrame {
         File file = new File(fileName == "" || fileName == null ? "./error.html" : fileName);
         if (fileName == "000000") {
             file = new File("./landing.html");
+            fileName =  "./landing.html";
         }
         System.out.println(fileName);
+        setUpPanel();
+        pane.setForeground(Color.white);
         try {
             pane.setPage(file.toURI().toURL());
             fileName = file.toURI().toURL().toString();
@@ -108,12 +129,23 @@ public class EditorFrame extends JFrame {
         int width = getSize().width;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
-        comp = new JScrollPane(pane);
-        panel.setSize((int) (width * .2), height);
-        panel.setBounds(0, 0, (int) (width * .2), height);
-        comp.setBounds((int) (width * .2), 0, (int) (width * .8), height);
-        getContentPane().add(comp);
-        add(panel);
+        textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
+        textArea.setCodeFoldingEnabled(true);
+
+        RSyntaxDocument document = (RSyntaxDocument) textArea.getDocument();
+        document.setSyntaxStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
+        textArea.setFont(Main.generateFonts(Main.jetbrains,15F));
+
+
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        sidebar = new JScrollPane(fileTree);
+        main = new JScrollPane(textArea);
+      //  sidebar.setSize((int) (width * .2), height);
+        sidebar.setBounds(0, 0, (int) (width * .2), height);
+        main.setBounds((int) (width * .2), 0, (int) (width * .8), height);
+        getContentPane().add(main);
+        getContentPane().add(sidebar);
+//        add(new JScrollPane(panel));
         configureMenu();
         setJMenuBar(bar);
         setVisible(true);
@@ -129,13 +161,13 @@ public class EditorFrame extends JFrame {
 
             @Override
             public void componentResized(ComponentEvent e) {
-                if (comp != null) {
+                if (main != null) {
                     int height = e.getComponent().getSize().height;
                     int width = e.getComponent().getSize().width;
                     setLayout(null);
-                    panel.setSize((int) (width * .2), height);
-                    panel.setBounds(0, 0, (int) (width * .2), height);
-                    comp.setBounds((int) (width * .2), 0, (int) (width * .8), height);
+                   // sidebar.setSize((int) (width * .2), height);
+                    sidebar.setBounds(0, 0, (int) (width * .2), height);
+                    main.setBounds((int) (width * .2), 0, (int) (width * .8), height);
                 }
             }
 
@@ -165,7 +197,10 @@ public class EditorFrame extends JFrame {
         help.setText("Help");
         JMenu[] menus = {fileMenu, view, edit, settings, help};
         Arrays.stream(menus).forEach(item ->
-                bar.add(item)
+                {
+                    bar.add(item);
+                    item.setFont(generateFonts(Main.droid,15f));
+                }
         );
 
         JMenuItem newFile = new JMenuItem("New file");
@@ -227,20 +262,26 @@ public class EditorFrame extends JFrame {
                 int i = fc.showOpenDialog(null);
                 if (i == JFileChooser.APPROVE_OPTION) {
                     File f = fc.getSelectedFile();
-                    String filepath = f.getPath();
-                    fileName = filepath;
                     try {
-                        BufferedReader br = new BufferedReader(new FileReader(filepath));
-                        String s1 = "", s2 = "";
-                        while ((s1 = br.readLine()) != null) {
-                            s2 += s1 + "\n";
-                        }
-                        pane.setText(s2);
-                        fileName = filepath;
-                        br.close();
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
+                        pane.setText(IOUtils.toString(new FileReader(f)));
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
                     }
+                    String filepath = f.getPath();
+
+                    fileName = filepath;
+//                    try {
+//                        BufferedReader br = new BufferedReader(new FileReader(filepath));
+//                        String s1 = "", s2 = "";
+//                        while ((s1 = br.readLine()) != null) {
+//                            s2 += s1 + "\n";
+//                        }
+//                       // pane.setText(s2);
+//                        fileName = filepath;
+//                        br.close();
+//                    } catch (Exception ex) {
+//                        ex.printStackTrace();
+//                    }
                 }
             }
         });
@@ -333,5 +374,37 @@ public class EditorFrame extends JFrame {
 
 
     }
+public void setUpPanel() {
+    File file = new File("./file.html");
+    fileTree = new FileTree(file.getAbsoluteFile().getParent());
+    fileTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
+        public void valueChanged(TreeSelectionEvent e) {
+            // Handle tree selection change event here
+            System.out.println("tree "+e.getPath());
+            String fullPath = file.getAbsoluteFile().getParent();
+            for (int i = 1; i < e.getPath().getPath().length; i++){
+                fullPath=fullPath+"/"+e.getPath().getPath()[i].toString();
+            }
+            try {
+                File file = new File(fullPath);
+                if (!   file.isDirectory()) {
+                FileReader fr = new FileReader(file);
+                pane.setText(IOUtils.toString(fr));
+                fr.close();
+                }
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
 
+            System.out.println(fullPath);
+            File file = new File(e.getPath().toString());
+            fileName =fullPath;
+
+            TreePath selectedPath = e.getPath();
+            Object selectedNode = selectedPath.getLastPathComponent();
+            // ...
+        }
+    });
+    panel.add(fileTree);
+}
 }

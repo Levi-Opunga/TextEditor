@@ -1,12 +1,8 @@
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
     
   </head>
   <body>
-    <h1>
-      Welcome
-    </h1>
+    &lt;html&gt;&lt;h2 style=&quot;color:green&quot;&gt;hello&lt;/h2&gt;&lt;/html&gt;gg
   </body>
 </html>

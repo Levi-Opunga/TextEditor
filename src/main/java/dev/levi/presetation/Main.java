@@ -1,8 +1,7 @@
 package dev.levi.presetation;
 
-import dev.levi.data.FileDao;
-import dev.levi.data.FileDaoImpl;
-import dev.levi.domain.Files;
+import dev.levi.presetation.components.DarkThemeFileChooser;
+import dev.levi.utils.Languages;
 import org.apache.commons.io.IOUtils;
 import org.netbeans.api.java.lexer.JavaTokenId;
 import org.netbeans.api.java.source.ui.DialogBinding;
@@ -14,28 +13,28 @@ import org.openide.text.CloneableEditorSupport;
 
 import javax.swing.*;
 import javax.swing.text.*;
+import java.awt.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 public class Main {
+   public static File droid = new File("./Fonts/DroidSans.ttf");
+  public  static File jetbrains = new File("./Fonts/JetBrains Mono Bold Nerd Font Complete.ttf");
+   public static File fira = new File("./Fonts/Fira Code Regular Nerd Font Complete Mono.ttf");
+  public static   File hack = new File("./Fonts/Hack Bold Nerd Font Complete.ttf");
+    private static Font uifont;
+
     public static void main(String[] args) throws IOException {
-      //  App app = App.getInstance();
-    //  doSyntaxColoring("./App.java");
-       // completion();
-        FileDao dao = new FileDaoImpl();
-        dao.createFile(new Files(0,"sample.txt","/home/login",System.currentTimeMillis()));
-        dao.createFile(new Files(0,"sample.txt","/home/login",System.currentTimeMillis()));
-        dao.createFile(new Files(0,"sample.txt","/home/login",System.currentTimeMillis()));
-        dao.createFile(new Files(0,"sample.txt","/home/login",System.currentTimeMillis()));
-        dao.createFile(new Files(0,"sample.txt","/home/login",System.currentTimeMillis()));
-       dao.findAllFiles().forEach(System.out::println);
+
+        setUpdarktheme();
         EditorFrame frame = new EditorFrame();
     }
+
     public static void doSyntaxColoring(String fileName) {
         JFrame f = new JFrame("JAVA Syntax Coloring");
 
@@ -45,7 +44,7 @@ public class Main {
 
         JEditorPane pane = new JEditorPane();
         EditorKit kit = CloneableEditorSupport.getEditorKit("text/x-java");
-       pane.setEditorKit(kit);
+        pane.setEditorKit(kit);
 
 //        File file = new File("./App.java");
 //        try {
@@ -78,14 +77,14 @@ public class Main {
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setLayout(null);
         JScrollPane comp = new JScrollPane(pane);
-        comp.setBounds(300,45,250,233);
+        comp.setBounds(300, 45, 250, 233);
         f.getContentPane().add(comp);
         f.setSize(800, 800);
         f.setVisible(true);
     }
 
 
-    public  static void completion() throws IOException {
+    public static void completion() throws IOException {
         JFrame frame = new JFrame();
         JEditorPane editorPane = new JEditorPane();
 
@@ -124,6 +123,37 @@ public class Main {
 
     }
 
+    public static void setUpdarktheme() {
+
+//        try {
+//            uifont = Font.createFont(Font.TRUETYPE_FONT, droid);
+//            uifont = uifont.deriveFont(15f);
+
+//
+//        } catch (FontFormatException | IOException e) {
+//            throw new RuntimeException(e);
+//        }
+        uifont = generateFonts(droid,15f);
+        UIManager.put("EditorPane.font",generateFonts(jetbrains,12f));
+        UIManager.put("MenuItem.font", uifont);
+            UIManager.put("Button.border", null);
+        DarkThemeFileChooser.setColors();
+    }
+
+    public static Font generateFonts(File fontFile,Float size) {
+        Font f = null;
+        try {
+            f = Font.createFont(Font.TRUETYPE_FONT,fontFile);
+        } catch (FontFormatException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        f= f.deriveFont(size);
+        return f;
+
+    }
+
 //    public static void connectH2(){
 //        try {
 //            Connection conn = DriverManager.getConnection ("jdbc:h2:./src/main/resources/db", "sa","");
@@ -145,4 +175,6 @@ public class Main {
 //            throw new RuntimeException(e);
 //        }
 //    }
+
+
 }
