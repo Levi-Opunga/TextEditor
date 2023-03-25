@@ -44,7 +44,6 @@ import java.util.concurrent.Executors;
 import static dev.levi.presetation.Main.generateFonts;
 
 public class EditorFrame extends JFrame implements ActionListener, WindowListener {
-    private static ExecutorService executor = Executors.newFixedThreadPool(5);
 
     private JPanel panel = new JPanel();
     private JMenuBar bar = new JMenuBar();
