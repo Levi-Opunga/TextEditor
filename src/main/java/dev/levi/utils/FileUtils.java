@@ -1,0 +1,126 @@
+package dev.levi.utils;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class FileUtils {
+
+    public static String getMime(String extension){
+        Map<String, String> mimeToExtension = new HashMap<>();
+        mimeToExtension.put("txt", "text/plain");
+        mimeToExtension.put("as", "text/actionscript");
+        mimeToExtension.put("s", "text/asm");
+        mimeToExtension.put("s65", "text/asm6502");
+        mimeToExtension.put("bbc", "text/bbcode");
+        mimeToExtension.put("c", "text/c");
+        mimeToExtension.put("clj", "text/clojure");
+        mimeToExtension.put("cpp", "text/cpp");
+        mimeToExtension.put("cs", "text/cs");
+        mimeToExtension.put("css", "text/css");
+        mimeToExtension.put("csv", "text/csv");
+        mimeToExtension.put("d", "text/d");
+        mimeToExtension.put("dockerfile", "text/dockerfile");
+        mimeToExtension.put("dart", "text/dart");
+        mimeToExtension.put("dpr", "text/delphi");
+        mimeToExtension.put("dtd", "text/dtd");
+        mimeToExtension.put("f", "text/fortran");
+        mimeToExtension.put("go", "text/golang");
+        mimeToExtension.put("groovy", "text/groovy");
+        mimeToExtension.put("hbs", "text/handlebars");
+        mimeToExtension.put("hosts", "text/hosts");
+        mimeToExtension.put("htaccess", "text/htaccess");
+        mimeToExtension.put("html", "text/html");
+        mimeToExtension.put("ini", "text/ini");
+        mimeToExtension.put("java", "text/java");
+        mimeToExtension.put("js", "text/javascript");
+        mimeToExtension.put("json", "text/json");
+        mimeToExtension.put("jshintrc", "text/jshintrc");
+        mimeToExtension.put("jsp", "text/jsp");
+        mimeToExtension.put("kt", "text/kotlin");
+        mimeToExtension.put("tex", "text/latex");
+        mimeToExtension.put("less", "text/less");
+        mimeToExtension.put("lisp", "text/lisp");
+        mimeToExtension.put("lua", "text/lua");
+        mimeToExtension.put("mk", "text/makefile");
+        mimeToExtension.put("md", "text/markdown");
+        mimeToExtension.put("mxml", "text/mxml");
+        mimeToExtension.put("nsi", "text/nsis");
+        mimeToExtension.put("pl", "text/perl");
+        mimeToExtension.put("php", "text/php");
+        mimeToExtension.put("proto", "text/proto");
+        mimeToExtension.put("properties", "text/properties");
+        mimeToExtension.put("py", "text/python");
+        mimeToExtension.put("rb", "text/ruby");
+        mimeToExtension.put("sas", "text/sas");
+        mimeToExtension.put("scala", "text/scala");
+        mimeToExtension.put("sql", "text/sql");
+        mimeToExtension.put("tcl", "text/tcl");
+        mimeToExtension.put("ts", "text/typescript");
+        mimeToExtension.put("sh", "text/unix");
+        mimeToExtension.put("vb", "text/vb");
+        mimeToExtension.put("bat", "text/bat");
+        mimeToExtension.put("xml", "text/xml");
+        mimeToExtension.put("yaml", "text/yaml");
+
+        return    mimeToExtension.get(extension);
+    }
+
+    public static String getExtension(String mime) {
+        Map<String, String> mimeToFileExtension = new HashMap<>();
+        mimeToFileExtension.put("text/plain", ".txt");
+        mimeToFileExtension.put("text/actionscript", ".as");
+        mimeToFileExtension.put("text/asm", ".asm");
+        mimeToFileExtension.put("text/asm6502", ".asm");
+        mimeToFileExtension.put("text/bbcode", ".bbcode");
+        mimeToFileExtension.put("text/c", ".c");
+        mimeToFileExtension.put("text/clojure", ".clj");
+        mimeToFileExtension.put("text/cpp", ".cpp");
+        mimeToFileExtension.put("text/cs", ".cs");
+        mimeToFileExtension.put("text/css", ".css");
+        mimeToFileExtension.put("text/csv", ".csv");
+        mimeToFileExtension.put("text/d", ".d");
+        mimeToFileExtension.put("text/dockerfile", ".dockerfile");
+        mimeToFileExtension.put("text/dart", ".dart");
+        mimeToFileExtension.put("text/delphi", ".pas");
+        mimeToFileExtension.put("text/dtd", ".dtd");
+        mimeToFileExtension.put("text/fortran", ".f");
+        mimeToFileExtension.put("text/golang", ".go");
+        mimeToFileExtension.put("text/groovy", ".groovy");
+        mimeToFileExtension.put("text/handlebars", ".hbs");
+        mimeToFileExtension.put("text/hosts", ".hosts");
+        mimeToFileExtension.put("text/htaccess", ".htaccess");
+        mimeToFileExtension.put("text/html", ".html");
+        mimeToFileExtension.put("text/ini", ".ini");
+        mimeToFileExtension.put("text/java", ".java");
+        mimeToFileExtension.put("text/javascript", ".js");
+        mimeToFileExtension.put("text/json", ".json");
+        mimeToFileExtension.put("text/jshintrc", ".jshintrc");
+        mimeToFileExtension.put("text/jsp", ".jsp");
+        mimeToFileExtension.put("text/kotlin", ".kt");
+        mimeToFileExtension.put("text/latex", ".tex");
+        mimeToFileExtension.put("text/less", ".less");
+        mimeToFileExtension.put("text/lisp", ".lisp");
+        mimeToFileExtension.put("text/lua", ".lua");
+        mimeToFileExtension.put("text/makefile", "Makefile");
+        mimeToFileExtension.put("text/markdown", ".md");
+        mimeToFileExtension.put("text/mxml", ".mxml");
+        mimeToFileExtension.put("text/nsis", ".nsi");
+        mimeToFileExtension.put("text/perl", ".pl");
+        mimeToFileExtension.put("text/php", ".php");
+        mimeToFileExtension.put("text/proto", ".proto");
+        mimeToFileExtension.put("text/properties", ".properties");
+        mimeToFileExtension.put("text/python", ".py");
+        mimeToFileExtension.put("text/ruby", ".rb");
+        mimeToFileExtension.put("text/sas", ".sas");
+        mimeToFileExtension.put("text/scala", ".scala");
+        mimeToFileExtension.put("text/sql", ".sql");
+        mimeToFileExtension.put("text/tcl", ".tcl");
+        mimeToFileExtension.put("text/typescript", ".ts");
+        mimeToFileExtension.put("text/unix", "");
+        mimeToFileExtension.put("text/vb", ".vb");
+        mimeToFileExtension.put("text/bat", ".bat");
+        mimeToFileExtension.put("text/xml", ".xml");
+        mimeToFileExtension.put("text/yaml", ".yaml");
+ return mimeToFileExtension.get(mime);
+    }
+}

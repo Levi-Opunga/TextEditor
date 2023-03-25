@@ -52,16 +52,7 @@ public class DarkThemeFileChooser {
 //        } catch (UnsupportedLookAndFeelException e) {
 //            throw new RuntimeException(e);
 //        }
-        try {
-            UIManager.setLookAndFeel(new FlatIntelliJLaf());
-        } catch (UnsupportedLookAndFeelException e) {
-            throw new RuntimeException(e);
-        }
 
-        //UIManager.installLookAndFeel("Flat IntelliJ", com.formdev.flatlaf.FlatIntelliJLaf.class.getName());
-
-        UIManager.put("Tree.collapsedIcon", UIManager.getIcon("Tree.collapsedIcon"));
-        UIManager.put("Tree.expandedIcon", UIManager.getIcon("Tree.expandedIcon"));
 //        UIManager.put("Tree.closedIcon", folderIcon);
 //        UIManager.put("Tree.openIcon", folderIcon);
 //        UIManager.put("Tree.leafIcon", fileIcon);

@@ -10,7 +10,6 @@ public class RoundedTextField extends JTextField {
 
     public RoundedTextField(int size) {
         super(size);
-        DarkThemeFileChooser.setColors();
         setOpaque(false);
     }
 

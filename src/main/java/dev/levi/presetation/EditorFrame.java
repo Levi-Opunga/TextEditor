@@ -5,11 +5,21 @@ import com.formdev.flatlaf.icons.FlatTreeExpandedIcon;
 import dev.levi.presetation.components.DarkThemeFileChooser;
 import dev.levi.presetation.components.FileTree;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.fife.rsta.ac.java.JavaLanguageSupport;
+import org.fife.rsta.ac.perl.PerlLanguageSupport;
+import org.fife.ui.autocomplete.CompletionProvider;
 import org.fife.ui.rsyntaxtextarea.*;
+import org.fife.ui.autocomplete.*;
+import org.fife.rsta.ac.LanguageSupportFactory;
+
+
+
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.netbeans.api.java.lexer.JavaTokenId;
 import org.netbeans.api.lexer.Language;
+import org.netbeans.modules.java.platform.util.FileNameUtil;
 import org.openide.text.CloneableEditorSupport;
 
 import javax.swing.*;
@@ -113,6 +123,9 @@ public class EditorFrame extends JFrame {
         }
 
 
+
+
+
         setSize(600, 600);
         textArea.setText(FileUtils.readFileToString(file, StandardCharsets.UTF_8));
         int height = getSize().height;
@@ -144,16 +157,63 @@ public class EditorFrame extends JFrame {
 
         sidebar = new JScrollPane(fileTree);
         main = new RTextScrollPane(textArea);
+        main.setHorizontalScrollBarPolicy(RTextScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        main.setFoldIndicatorEnabled(true);
+
       //  sidebar.setSize((int) (width * .2), height);
         sidebar.setBounds(0, 0, (int) (width * .2), height);
         main.setBounds((int) (width * .2), 0, (int) (width * .8), height);
         getContentPane().add(main);
         getContentPane().add(sidebar);
 //        add(new JScrollPane(panel));
+        LanguageSupportFactory lsf = LanguageSupportFactory.get();
+        JavaLanguageSupport support = (JavaLanguageSupport) lsf.
+                getSupportFor(SyntaxConstants.SYNTAX_STYLE_JAVA);
+
+
+        CompletionProvider provider = createCompletionProvider();
+
+        AutoCompletion ac = new AutoCompletion(provider);
+        ac.install(textArea);
+        support.setAutoActivationEnabled(true);
+        support.install(textArea);
         configureMenu();
         setJMenuBar(bar);
         setVisible(true);
     }
+    private CompletionProvider createCompletionProvider() {
+
+        // A DefaultCompletionProvider is the simplest concrete implementation
+        // of CompletionProvider. This provider has no understanding of
+        // language semantics. It simply checks the text entered up to the
+        // caret position for a match against known completions. This is all
+        // that is needed in the majority of cases.
+        DefaultCompletionProvider provider = new DefaultCompletionProvider();
+
+        // Add completions for all Java keywords. A BasicCompletion is just
+        // a straightforward word completion.
+        provider.addCompletion(new BasicCompletion(provider, "abstract"));
+        provider.addCompletion(new BasicCompletion(provider, "assert"));
+        provider.addCompletion(new BasicCompletion(provider, "break"));
+        provider.addCompletion(new BasicCompletion(provider, "case"));
+        // ... etc ...
+        provider.addCompletion(new BasicCompletion(provider, "transient"));
+        provider.addCompletion(new BasicCompletion(provider, "try"));
+        provider.addCompletion(new BasicCompletion(provider, "void"));
+        provider.addCompletion(new BasicCompletion(provider, "volatile"));
+        provider.addCompletion(new BasicCompletion(provider, "while"));
+
+        // Add a couple of "shorthand" completions. These completions don't
+        // require the input text to be the same thing as the replacement text.
+        provider.addCompletion(new ShorthandCompletion(provider, "sysout",
+                "System.out.println(", "System.out.println("));
+        provider.addCompletion(new ShorthandCompletion(provider, "syserr",
+                "System.err.println(", "System.err.println("));
+
+        return provider;
+
+    }
+
 
     private void setClickLISTener() {
 
@@ -197,7 +257,7 @@ public class EditorFrame extends JFrame {
         fileMenu.setText("File");
         view.setText("View");
         edit.setText("Edit");
-        settings.setText("Settings");
+        settings.setText("Settings ");
         help.setText("Help");
         JMenu[] menus = {fileMenu, view, edit, settings, help};
         Arrays.stream(menus).forEach(item ->
@@ -246,11 +306,7 @@ public class EditorFrame extends JFrame {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-//                        try {
-//                          //  htmlPreview();
-//                        } catch (IOException ex) {
-//                            throw new RuntimeException(ex);
-//                        }
+
                     }
                 }
 
@@ -273,18 +329,7 @@ public class EditorFrame extends JFrame {
                     String filepath = f.getPath();
                     fileName = filepath;
                     setUpPanel();
-//                    try {
-//                        BufferedReader br = new BufferedReader(new FileReader(filepath));
-//                        String s1 = "", s2 = "";
-//                        while ((s1 = br.readLine()) != null) {
-//                            s2 += s1 + "\n";
-//                        }
-//                       // textArea.setText(s2);
-//                        fileName = filepath;
-//                        br.close();
-//                    } catch (Exception ex) {
-//                        ex.printStackTrace();
-//                    }
+
                 }
 
         });
@@ -316,28 +361,7 @@ public class EditorFrame extends JFrame {
 
 
     }
-//
-//    private void htmlPreview() throws IOException {
-//        if (previewHtml == false) {
-//            if (fileName.contains("html") || fileName.contains("htm")) {
-//                textArea.setContentType("text/html");
-//                HTMLEditorKit editorKit = new HTMLEditorKit();
-//                textArea.setEditorKit(editorKit);
-//
-//                File file = new File(fileName);
-//                textArea.setPage(file.toURI().toURL());
-//                textArea.setEditable(false);
-//                previewHtml=!previewHtml;
-//            }
-//        } else {
-//            textArea.setContentType("text/plain");
-//            previewHtml=!previewHtml;
-//            File file = new File(fileName);
-//            FileReader reader = new FileReader(file);
-//            textArea.setText(IOUtils.toString(reader));
-//            textArea.setEditable(true);
-//        }
-//    }
+
 
     private void presentationMode(String javaFile) {
 
@@ -397,10 +421,11 @@ public void setUpPanel() {
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-
-            System.out.println(fullPath);
-            File file = new File(e.getPath().toString());
+          String ext = FilenameUtils.getExtension(fullPath);
+            System.out.println(ext);
+           // File file = new File(e.getPath().toString());
             fileName =fullPath;
+
 
             TreePath selectedPath = e.getPath();
             Object selectedNode = selectedPath.getLastPathComponent();
@@ -409,4 +434,9 @@ public void setUpPanel() {
     });
     panel.add(fileTree);
 }
+
+public static void getCompletions(){
+
+}
+
 }
