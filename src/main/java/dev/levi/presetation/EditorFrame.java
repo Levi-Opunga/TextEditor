@@ -2,6 +2,7 @@ package dev.levi.presetation;
 
 import dev.levi.presetation.components.DarkThemeFileChooser;
 import dev.levi.presetation.components.FileTree;
+import dev.levi.presetation.components.SwingHTMLBrowser;
 import dev.levi.utils.FileExtensionUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -37,12 +38,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import static dev.levi.presetation.Main.generateFonts;
 
-public class EditorFrame extends JFrame implements ActionListener,WindowListener {
-   private static ExecutorService executor = Executors.newFixedThreadPool(5);
+public class EditorFrame extends JFrame implements ActionListener, WindowListener {
+    private static ExecutorService executor = Executors.newFixedThreadPool(5);
 
     private JPanel panel = new JPanel();
     private JMenuBar bar = new JMenuBar();
@@ -56,31 +56,32 @@ public class EditorFrame extends JFrame implements ActionListener,WindowListener
 
     private String fileName = "000000";
     //  TextEditorPane textArea = new TextEditorPane();
-    ImageIcon closedFolderIcon = new ImageIcon("./Images/folder.png");
-    ImageIcon openFolderIcon = new ImageIcon("./Images/open.png");
-    ImageIcon fileIcon = new ImageIcon("./Images/file.png");
-    private static int windowCount =0;
+    public static ImageIcon openFolderIcon = generateImageIcon(new ImageIcon("./Images/open.png"));
+    public static ImageIcon fileIcon = generateImageIcon(new ImageIcon("./Images/file.png"));
+    public static ImageIcon closedFolderIcon = generateImageIcon( new ImageIcon("./Images/folder.png"));
+    public static ImageIcon settingsIcon = generateImageIcon( new ImageIcon("./Images/settings.png"));
+    public static ImageIcon deleteIcon =generateImageIcon(new ImageIcon("./Images/delete.png"));
+    public static ImageIcon helpIcon = generateImageIcon(new ImageIcon("./Images/help.png"));
+    public static ImageIcon previewIcon = generateImageIcon(new ImageIcon("./Images/preview.png"));
+    public static ImageIcon webIcon =generateImageIcon(new ImageIcon("./Images/browser.gif"));
+    private static int windowCount = 0;
 
-    public EditorFrame(Action action){
+    public EditorFrame(Action action) {
 
     }
+
     {
-       windowCount=windowCount+1;
-      System.out.println("window "+windowCount);
+        windowCount = windowCount + 1;
+        System.out.println("window " + windowCount);
     }
-{
-    Image image = closedFolderIcon.getImage();
-    Image newImg = image.getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
-    closedFolderIcon = new ImageIcon(newImg);
 
-    Image image2 = openFolderIcon.getImage();
-    Image newImg2 = image.getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
-    openFolderIcon = new ImageIcon(newImg2);
 
-    Image iconImage = fileIcon.getImage();
-    Image image1 = iconImage.getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
-    fileIcon = new ImageIcon(image1);
-}
+    public static ImageIcon generateImageIcon(ImageIcon imageIcon){
+Image image = imageIcon.getImage();
+image = image.getScaledInstance(20,20,Image.SCALE_SMOOTH);
+return new ImageIcon(image);
+    }
+
     private RTextScrollPane main = null;
     private JScrollPane sidebar = null;
 
@@ -103,7 +104,6 @@ public class EditorFrame extends JFrame implements ActionListener,WindowListener
     }
 
 
-
     public EditorFrame(String fileName) throws HeadlessException, IOException {
         this.fileName = fileName;
         System.out.println("df6 " + fileName);
@@ -123,7 +123,7 @@ public class EditorFrame extends JFrame implements ActionListener,WindowListener
 
         panel.setBackground(Color.black);
 
-       //TODO() recent / new
+        //TODO() recent / new
         File file = new File(fileName == "" || fileName == null ? "./error.html" : fileName);
 //        if (fileName == "000000") {
 //            file = new File("./landing.html");
@@ -135,15 +135,19 @@ public class EditorFrame extends JFrame implements ActionListener,WindowListener
 
         setSize(600, 600);
         if (
-               !file.isDirectory()
-        ){
-        textArea.setText(FileUtils.readFileToString(file, StandardCharsets.UTF_8));
+                !file.isDirectory()
+        ) {
+            textArea.setText(FileUtils.readFileToString(file, StandardCharsets.UTF_8));
+            String ext = FilenameUtils.getExtension(file.getAbsolutePath());
+            System.out.println(ext);
+            getSyntaxCompletions(ext);
         }
+
         int height = getSize().height;
         int width = getSize().width;
 
-    setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    System.out.println("hidden "+windowCount);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        System.out.println("hidden " + windowCount);
 
 
         setLayout(null);
@@ -161,16 +165,16 @@ public class EditorFrame extends JFrame implements ActionListener,WindowListener
         }
 
         sidebar = new JScrollPane(fileTree);
-        main = new RTextScrollPane(textArea,true,Color.ORANGE);
+        main = new RTextScrollPane(textArea, true, Color.ORANGE);
         main.setHorizontalScrollBarPolicy(RTextScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         main.setFoldIndicatorEnabled(true);
         main.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         //  sidebar.setSize((int) (width * .2), height);
         tab.setBounds((int) (width * .2), 0, (int) (width * .8), 30);
-        tab.setFont(Main.generateFonts(Main.jetbrains,12f));
+        tab.setFont(Main.generateFonts(Main.jetbrains, 12f));
         tab.setText(fileName);
         sidebar.setBounds(0, 0, (int) (width * .2), height);
-        main.setBounds((int) (width * .2), 30, (int) (width * .8), height-30);
+        main.setBounds((int) (width * .2), 30, (int) (width * .8), height - 30);
         getContentPane().add(main);
         getContentPane().add(sidebar);
         getContentPane().add(tab);
@@ -231,7 +235,7 @@ public class EditorFrame extends JFrame implements ActionListener,WindowListener
                     setLayout(null);
                     // sidebar.setSize((int) (width * .2), height);
                     sidebar.setBounds(0, 0, (int) (width * .2), height);
-                    main.setBounds((int) (width * .2), 30, (int) (width * .8), height-30);
+                    main.setBounds((int) (width * .2), 30, (int) (width * .8), height - 30);
 
                 }
             }
@@ -267,6 +271,9 @@ public class EditorFrame extends JFrame implements ActionListener,WindowListener
                     item.setFont(generateFonts(Main.droid, 15f));
                 }
         );
+
+        JMenuItem settings = new JMenuItem("New file");
+
 
         JMenuItem newFile = new JMenuItem("New file");
         newFile.setIcon(fileIcon);
@@ -312,7 +319,8 @@ public class EditorFrame extends JFrame implements ActionListener,WindowListener
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-
+                        Thread thread = new Thread(() -> new SwingHTMLBrowser(fileName));
+                        thread.start();
                     }
                 }
 
@@ -323,7 +331,7 @@ public class EditorFrame extends JFrame implements ActionListener,WindowListener
             @Override
             public void actionPerformed(ActionEvent e) {
 
-               // DarkThemeFileChooser fc = new DarkThemeFileChooser();
+                // DarkThemeFileChooser fc = new DarkThemeFileChooser();
 
 
                 File f = new File(DarkThemeFileChooser.chooseAnyFile(true));
@@ -342,8 +350,9 @@ public class EditorFrame extends JFrame implements ActionListener,WindowListener
 
                     System.out.println("Thread Running");
                 });
-                executor.submit(thread);
-                System.out.println("here  "+fileName);
+                thread.start();
+//                executor.submit(thread);
+//                System.out.println("here  " + fileName);
                 setUpPanel();
 
             }
@@ -396,14 +405,14 @@ public class EditorFrame extends JFrame implements ActionListener,WindowListener
 
     public void setUpPanel() {
         File file = new File(fileName);
-        if(file.isDirectory()){
+        if (file.isDirectory()) {
             fileTree = new FileTree(file.toURI().getPath());
-        }else {
+        } else {
             fileTree = new FileTree(file.getAbsoluteFile().getParent());
         }
         //  JTree tree = new JTree(rootNode);
-       // System.out.println();
-        System.out.println("setiing up files tree "+file.getAbsoluteFile().getParent());
+        // System.out.println();
+        System.out.println("setiing up files tree " + file.getAbsoluteFile().getParent());
         // Customize the tree cell renderer to use FlatLaf icons
         DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) fileTree.getCellRenderer();
 
@@ -447,119 +456,120 @@ public class EditorFrame extends JFrame implements ActionListener,WindowListener
     public void getSyntaxCompletions(String extension) {
 
         String mime = FileExtensionUtil.getMime(extension);
-        System.out.println("mime" +mime);
+        System.out.println("mime" + mime);
         if (mime != null) {
             textArea.setSyntaxEditingStyle(mime);
-         //   RSyntaxDocument document = (RSyntaxDocument) textArea.getDocument();
+            //   RSyntaxDocument document = (RSyntaxDocument) textArea.getDocument();
 
             if (extension.toLowerCase().contains("c") ||
                     extension.toLowerCase().contains("css") ||
                     extension.toLowerCase().contains("groovy") ||
                     extension.toLowerCase().contains("html") ||
-                    extension.toLowerCase().contains("java" )||
+                    extension.toLowerCase().contains("java") ||
                     extension.toLowerCase().contains("js") ||
-                    extension.toLowerCase().contains("jsp" )||
+                    extension.toLowerCase().contains("jsp") ||
                     extension.toLowerCase().contains("pl") ||
                     extension.toLowerCase().contains("php") ||
-                    extension.toLowerCase().contains("sh" )||
+                    extension.toLowerCase().contains("sh") ||
                     extension.toLowerCase().contains("xml")) {
 
-if(extension.equals("java")) {
-    LanguageSupportFactory lsf = LanguageSupportFactory.get();
-    JavaLanguageSupport support = (JavaLanguageSupport) lsf.
-            getSupportFor(mime);
+                if (extension.equals("java")) {
+                    LanguageSupportFactory lsf = LanguageSupportFactory.get();
+                    JavaLanguageSupport support = (JavaLanguageSupport) lsf.
+                            getSupportFor(mime);
 //    CompletionProvider provider = createCompletionProvider();
 //                AutoCompletion ac = new AutoCompletion(provider);
 //                ac.install(textArea);
-                support.setAutoActivationEnabled(true);
-                support.install(textArea);
-} else if (extension.equals("c")) {
-    LanguageSupportFactory lsf = LanguageSupportFactory.get();
-    CLanguageSupport support = (CLanguageSupport) lsf.
-            getSupportFor(mime);
+                    support.setAutoActivationEnabled(true);
+                    support.install(textArea);
+                } else if (extension.equals("c")) {
+                    LanguageSupportFactory lsf = LanguageSupportFactory.get();
+                    CLanguageSupport support = (CLanguageSupport) lsf.
+                            getSupportFor(mime);
 
-    support.setAutoActivationEnabled(true);
-    support.install(textArea);
-}else if (extension.equals("css")) {
-    LanguageSupportFactory lsf = LanguageSupportFactory.get();
-    CssLanguageSupport support = (CssLanguageSupport) lsf.
-            getSupportFor(mime);
+                    support.setAutoActivationEnabled(true);
+                    support.install(textArea);
+                } else if (extension.equals("css")) {
+                    LanguageSupportFactory lsf = LanguageSupportFactory.get();
+                    CssLanguageSupport support = (CssLanguageSupport) lsf.
+                            getSupportFor(mime);
 
-    support.setAutoActivationEnabled(true);
-    support.install(textArea);
-}else if (extension.equals("groovy")) {
-    LanguageSupportFactory lsf = LanguageSupportFactory.get();
-    GroovyLanguageSupport support = (GroovyLanguageSupport) lsf.
-            getSupportFor(mime);
+                    support.setAutoActivationEnabled(true);
+                    support.install(textArea);
+                } else if (extension.equals("groovy")) {
+                    LanguageSupportFactory lsf = LanguageSupportFactory.get();
+                    GroovyLanguageSupport support = (GroovyLanguageSupport) lsf.
+                            getSupportFor(mime);
 
-    support.setAutoActivationEnabled(true);
-    support.install(textArea);
-}else if (extension.equals("html")) {
-    LanguageSupportFactory lsf = LanguageSupportFactory.get();
-    HtmlLanguageSupport support = (HtmlLanguageSupport) lsf.
-            getSupportFor(mime);
+                    support.setAutoActivationEnabled(true);
+                    support.install(textArea);
+                } else if (extension.equals("html")) {
+                    LanguageSupportFactory lsf = LanguageSupportFactory.get();
+                    HtmlLanguageSupport support = (HtmlLanguageSupport) lsf.
+                            getSupportFor(mime);
 
-    support.setAutoActivationEnabled(true);
-    support.install(textArea);
-}else if (extension.equals("js")) {
-    LanguageSupportFactory lsf = LanguageSupportFactory.get();
-    JavaScriptLanguageSupport support = (JavaScriptLanguageSupport) lsf.
-            getSupportFor(mime);
+                    support.setAutoActivationEnabled(true);
+                    support.install(textArea);
+                } else if (extension.equals("js")) {
+                    LanguageSupportFactory lsf = LanguageSupportFactory.get();
+                    JavaScriptLanguageSupport support = (JavaScriptLanguageSupport) lsf.
+                            getSupportFor(mime);
 
-    support.setAutoActivationEnabled(true);
-    support.install(textArea);
-}else if (extension.equals("jsp")) {
-    LanguageSupportFactory lsf = LanguageSupportFactory.get();
-    JspLanguageSupport support = (JspLanguageSupport) lsf.
-            getSupportFor(mime);
+                    support.setAutoActivationEnabled(true);
+                    support.install(textArea);
+                } else if (extension.equals("jsp")) {
+                    LanguageSupportFactory lsf = LanguageSupportFactory.get();
+                    JspLanguageSupport support = (JspLanguageSupport) lsf.
+                            getSupportFor(mime);
 
-    support.setAutoActivationEnabled(true);
-    support.install(textArea);
-}else if (extension.equals("pl")) {
-    LanguageSupportFactory lsf = LanguageSupportFactory.get();
-    PerlLanguageSupport support = (PerlLanguageSupport) lsf.
-            getSupportFor(mime);
+                    support.setAutoActivationEnabled(true);
+                    support.install(textArea);
+                } else if (extension.equals("pl")) {
+                    LanguageSupportFactory lsf = LanguageSupportFactory.get();
+                    PerlLanguageSupport support = (PerlLanguageSupport) lsf.
+                            getSupportFor(mime);
 
-    support.setAutoActivationEnabled(true);
-    support.install(textArea);
-}else if (extension.equals("php")) {
-    LanguageSupportFactory lsf = LanguageSupportFactory.get();
-    PhpLanguageSupport support = (PhpLanguageSupport) lsf.
-            getSupportFor(mime);
+                    support.setAutoActivationEnabled(true);
+                    support.install(textArea);
+                } else if (extension.equals("php")) {
+                    LanguageSupportFactory lsf = LanguageSupportFactory.get();
+                    PhpLanguageSupport support = (PhpLanguageSupport) lsf.
+                            getSupportFor(mime);
 
-    support.setAutoActivationEnabled(true);
-    support.install(textArea);
-}else if (extension.equals("sh")) {
-    LanguageSupportFactory lsf = LanguageSupportFactory.get();
-    ShellLanguageSupport support = (ShellLanguageSupport) lsf.
-            getSupportFor(mime);
+                    support.setAutoActivationEnabled(true);
+                    support.install(textArea);
+                } else if (extension.equals("sh")) {
+                    LanguageSupportFactory lsf = LanguageSupportFactory.get();
+                    ShellLanguageSupport support = (ShellLanguageSupport) lsf.
+                            getSupportFor(mime);
 
-    support.setAutoActivationEnabled(true);
-    support.install(textArea);
-}else if (extension.equals("xml")) {
-    LanguageSupportFactory lsf = LanguageSupportFactory.get();
-    XmlLanguageSupport support = (XmlLanguageSupport) lsf.
-            getSupportFor(mime);
+                    support.setAutoActivationEnabled(true);
+                    support.install(textArea);
+                } else if (extension.equals("xml")) {
+                    LanguageSupportFactory lsf = LanguageSupportFactory.get();
+                    XmlLanguageSupport support = (XmlLanguageSupport) lsf.
+                            getSupportFor(mime);
 //
-    support.setAutoActivationEnabled(true);
-    support.install(textArea);
-}
+                    support.setAutoActivationEnabled(true);
+                    support.install(textArea);
+                }
 
-            }else {
+            } else {
 
             }
         }
     }
-public void setTextEditorTheme(String xmlfile){
 
-}
+    public void setTextEditorTheme(String xmlfile) {
+
+    }
 
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-       if(actionEvent.getActionCommand().equals("exit")){
+        if (actionEvent.getActionCommand().equals("exit")) {
 
-       }
+        }
     }
 
     @Override
@@ -569,8 +579,8 @@ public void setTextEditorTheme(String xmlfile){
 
     @Override
     public void windowClosing(WindowEvent windowEvent) {
-     windowCount=windowCount-1;
-     System.out.println("closing "+windowCount);
+        windowCount = windowCount - 1;
+        System.out.println("closing " + windowCount);
     }
 
     @Override
@@ -598,7 +608,6 @@ public void setTextEditorTheme(String xmlfile){
 
     }
 }
-
 
 
 // document.setSyntaxStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);

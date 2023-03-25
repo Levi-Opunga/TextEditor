@@ -1,8 +1,11 @@
-package dev.levi.presetation;
+package dev.levi.presetation.components;
+
+import dev.levi.presetation.Main;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.html.*;
@@ -10,6 +13,19 @@ import javax.swing.text.html.*;
 public class SwingHTMLBrowser extends JFrame implements ActionListener, HyperlinkListener {
     private JTextField addressBar;
     private JEditorPane pane;
+
+    public SwingHTMLBrowser(String initial){
+        this();
+        try {
+            if(initial.startsWith("/")||initial.startsWith(".")){
+                File file = new File(initial);
+                pane.setPage(file.toURI().toURL());
+            }
+            pane.setPage(initial);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
 
     SwingHTMLBrowser() {
         super("Swing HTML Browser");

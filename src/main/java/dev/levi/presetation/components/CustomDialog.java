@@ -26,11 +26,11 @@ public class CustomDialog extends JDialog {
     public void hideDialog() {
         setVisible(false);
     }
-    public static void main(String[] args) {
-        JFrame parentFrame = new JFrame("Parent Frame");
-        parentFrame.setVisible(true);
-        parentFrame.setSize(234,567);
-        CustomDialog dialog = new CustomDialog(parentFrame, "Custom Dialog", "This is a custom dialog box.");
-        dialog.setVisible(true);
-    }
+//    public static void main(String[] args) {
+//        JFrame parentFrame = new JFrame("Parent Frame");
+//        parentFrame.setVisible(true);
+//        parentFrame.setSize(234,567);
+//        CustomDialog dialog = new CustomDialog(parentFrame, "Custom Dialog", "This is a custom dialog box.");
+//        dialog.setVisible(true);
+//    }
 }
