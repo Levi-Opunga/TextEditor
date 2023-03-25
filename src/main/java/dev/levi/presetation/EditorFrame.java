@@ -1,35 +1,23 @@
 package dev.levi.presetation;
 
-import com.formdev.flatlaf.icons.FlatTreeCollapsedIcon;
-import com.formdev.flatlaf.icons.FlatTreeExpandedIcon;
 import dev.levi.presetation.components.DarkThemeFileChooser;
 import dev.levi.presetation.components.FileTree;
+import dev.levi.utils.FileExtensionUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.fife.rsta.ac.java.JavaLanguageSupport;
-import org.fife.rsta.ac.perl.PerlLanguageSupport;
 import org.fife.ui.autocomplete.CompletionProvider;
 import org.fife.ui.rsyntaxtextarea.*;
 import org.fife.ui.autocomplete.*;
 import org.fife.rsta.ac.LanguageSupportFactory;
 
 
-
 import org.fife.ui.rtextarea.RTextScrollPane;
-import org.netbeans.api.java.lexer.JavaTokenId;
-import org.netbeans.api.lexer.Language;
-import org.netbeans.modules.java.platform.util.FileNameUtil;
-import org.openide.text.CloneableEditorSupport;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.EditorKit;
-import javax.swing.text.StyledDocument;
-import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -51,20 +39,35 @@ public class EditorFrame extends JFrame {
     private JMenu help = new JMenu();
     private JMenu viewMenu = new JMenu();
     private String fileName = "000000";
-  //  TextEditorPane textArea = new TextEditorPane();
+    //  TextEditorPane textArea = new TextEditorPane();
+    ImageIcon closedFolderIcon = new ImageIcon("./Images/folder.png");
+    ImageIcon openFolderIcon = new ImageIcon("./Images/open.png");
+    ImageIcon fileIcon = new ImageIcon("./Images/file.png");
 
 
 //    private JEditorPane textArea = new JEditorPane();
+{
+    Image image = closedFolderIcon.getImage();
+    Image newImg = image.getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
+    closedFolderIcon = new ImageIcon(newImg);
 
+    Image image2 = openFolderIcon.getImage();
+    Image newImg2 = image.getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
+    openFolderIcon = new ImageIcon(newImg2);
+
+    Image iconImage = fileIcon.getImage();
+    Image image1 = iconImage.getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
+    fileIcon = new ImageIcon(image1);
+}
     private RTextScrollPane main = null;
     private JScrollPane sidebar = null;
 
 
-   // private RTextScrollPane scrollPane;
+    // private RTextScrollPane scrollPane;
     private boolean previewHtml = false;
     private JTree fileTree;
 
-   RSyntaxTextArea textArea = new RSyntaxTextArea();
+    RSyntaxTextArea textArea = new RSyntaxTextArea();
     //RSyntaxDocument document = (RSyntaxDocument)textArea.getDocument();
 
 
@@ -76,6 +79,7 @@ public class EditorFrame extends JFrame {
         }
 
     }
+
     {
 
     }
@@ -97,56 +101,30 @@ public class EditorFrame extends JFrame {
     public void initializeView(String fileName) throws IOException {
 
 
-
-        StyledDocument doc = new DefaultStyledDocument();
-        doc.putProperty(Language.class, JavaTokenId.language());
-
         panel.setBackground(Color.black);
 
-        //EditorKit kit = CloneableEditorSupport.getEditorKit("text/x-java");
-        //textArea.setEditorKit(kit);
-
+       //TODO() recent / new
         File file = new File(fileName == "" || fileName == null ? "./error.html" : fileName);
         if (fileName == "000000") {
             file = new File("./landing.html");
-            fileName =  "./landing.html";
+            fileName = "./landing.html";
         }
-        System.out.println(fileName);
+        // System.out.println(fileName);
         setUpPanel();
-        textArea.setForeground(Color.white);
-
-        try {
-            textArea.setText(FileUtils.readFileToString(file, StandardCharsets.UTF_8));
-            fileName = file.toURI().toURL().toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-
-
 
 
         setSize(600, 600);
         textArea.setText(FileUtils.readFileToString(file, StandardCharsets.UTF_8));
         int height = getSize().height;
         int width = getSize().width;
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
-        textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
+
         textArea.setCodeFoldingEnabled(true);
 
-        RSyntaxDocument document = (RSyntaxDocument) textArea.getDocument();
-        // document.setSyntaxStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
-        Color backgroundColor = UIManager.getColor("TextArea.background");
-        Color foregroundColor = UIManager.getColor("TextArea.foreground");
-        Color selectionColor = UIManager.getColor("TextArea.selectionBackground");
-        Color caretColor = UIManager.getColor("TextArea.caretForeground");
-        textArea.setBackground(backgroundColor);
-        textArea.setForeground(foregroundColor);
-        textArea.setSelectionColor(selectionColor);
-        textArea.setCurrentLineHighlightColor(new Color(204, 204, 204));
-        textArea.setCaretColor(caretColor);
-        textArea.setFont(Main.generateFonts(Main.fira,20F));
+
+        textArea.setFont(Main.generateFonts(Main.droid, 20F));
         try {
             Theme theme = Theme.load(getClass().getResourceAsStream(
                     "/org/fife/ui/rsyntaxtextarea/themes/monokai.xml"));
@@ -156,31 +134,22 @@ public class EditorFrame extends JFrame {
         }
 
         sidebar = new JScrollPane(fileTree);
-        main = new RTextScrollPane(textArea);
+        main = new RTextScrollPane(textArea,true,Color.ORANGE);
         main.setHorizontalScrollBarPolicy(RTextScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         main.setFoldIndicatorEnabled(true);
-
-      //  sidebar.setSize((int) (width * .2), height);
+        main.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        //  sidebar.setSize((int) (width * .2), height);
         sidebar.setBounds(0, 0, (int) (width * .2), height);
         main.setBounds((int) (width * .2), 0, (int) (width * .8), height);
         getContentPane().add(main);
         getContentPane().add(sidebar);
 //        add(new JScrollPane(panel));
-        LanguageSupportFactory lsf = LanguageSupportFactory.get();
-        JavaLanguageSupport support = (JavaLanguageSupport) lsf.
-                getSupportFor(SyntaxConstants.SYNTAX_STYLE_JAVA);
 
-
-        CompletionProvider provider = createCompletionProvider();
-
-        AutoCompletion ac = new AutoCompletion(provider);
-        ac.install(textArea);
-        support.setAutoActivationEnabled(true);
-        support.install(textArea);
         configureMenu();
         setJMenuBar(bar);
         setVisible(true);
     }
+
     private CompletionProvider createCompletionProvider() {
 
         // A DefaultCompletionProvider is the simplest concrete implementation
@@ -229,7 +198,7 @@ public class EditorFrame extends JFrame {
                     int height = e.getComponent().getSize().height;
                     int width = e.getComponent().getSize().width;
                     setLayout(null);
-                   // sidebar.setSize((int) (width * .2), height);
+                    // sidebar.setSize((int) (width * .2), height);
                     sidebar.setBounds(0, 0, (int) (width * .2), height);
                     main.setBounds((int) (width * .2), 0, (int) (width * .8), height);
                 }
@@ -263,11 +232,12 @@ public class EditorFrame extends JFrame {
         Arrays.stream(menus).forEach(item ->
                 {
                     bar.add(item);
-                    item.setFont(generateFonts(Main.droid,15f));
+                    item.setFont(generateFonts(Main.droid, 15f));
                 }
         );
 
         JMenuItem newFile = new JMenuItem("New file");
+        newFile.setIcon(fileIcon);
         JMenuItem openExistingFile = new JMenuItem("Open file");
         JMenuItem openRecentFile = new JMenuItem("Recent Files");
         JMenuItem saveFile = new JMenuItem("Save");
@@ -320,17 +290,17 @@ public class EditorFrame extends JFrame {
                 System.out.println("here");
                 DarkThemeFileChooser fc = new DarkThemeFileChooser();
 
-                    File f = new File(fc.chooseAnyFile(true));
-                    try {
-                        textArea.setText(IOUtils.toString(new FileReader(f)));
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                    String filepath = f.getPath();
-                    fileName = filepath;
-                    setUpPanel();
-
+                File f = new File(fc.chooseAnyFile(true));
+                try {
+                    textArea.setText(IOUtils.toString(new FileReader(f)));
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
                 }
+                String filepath = f.getPath();
+                fileName = filepath;
+                setUpPanel();
+
+            }
 
         });
         saveFile.addActionListener(
@@ -377,66 +347,104 @@ public class EditorFrame extends JFrame {
 
 
     }
-public void setUpPanel() {
-    File file = new File(fileName);
-    fileTree = new FileTree(file.getAbsoluteFile().getParent());
-  //  JTree tree = new JTree(rootNode);
 
-    // Customize the tree cell renderer to use FlatLaf icons
-    DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) fileTree.getCellRenderer();
+    public void setUpPanel() {
+        File file = new File(fileName);
+        fileTree = new FileTree(file.getAbsoluteFile().getParent());
+        //  JTree tree = new JTree(rootNode);
 
-    ImageIcon closed = new ImageIcon("./Images/folder.png");
-    Image image = closed.getImage();
-    Image newImg = image.getScaledInstance(20, 20,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
-    closed = new ImageIcon(newImg);
+        // Customize the tree cell renderer to use FlatLaf icons
+        DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) fileTree.getCellRenderer();
 
-    ImageIcon open = new ImageIcon("./Images/open.png");
-    Image image2 = open.getImage();
-    Image newImg2 = image.getScaledInstance(20, 20,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
-    open = new ImageIcon(newImg2);
 
-    ImageIcon fileIcon = new ImageIcon("./Images/file.png");
-    Image iconImage = fileIcon.getImage();
-    Image image1 = iconImage.getScaledInstance(20, 20,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
-    fileIcon = new ImageIcon(image1);
-
-    renderer.setOpenIcon(open);
-    renderer.setClosedIcon(closed);
-    renderer.setLeafIcon(fileIcon);
-    fileTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
-        public void valueChanged(TreeSelectionEvent e) {
-            // Handle tree selection change event here
-            System.out.println("tree "+e.getPath());
-            String fullPath = file.getAbsoluteFile().getParent();
-            for (int i = 1; i < e.getPath().getPath().length; i++){
-                fullPath=fullPath+"/"+e.getPath().getPath()[i].toString();
-            }
-            try {
-                File file = new File(fullPath);
-                if (!   file.isDirectory()) {
-                FileReader fr = new FileReader(file);
-                textArea.setText(IOUtils.toString(fr));
-                fr.close();
+        renderer.setOpenIcon(openFolderIcon);
+        renderer.setClosedIcon(closedFolderIcon);
+        renderer.setLeafIcon(fileIcon);
+        fileTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
+            public void valueChanged(TreeSelectionEvent e) {
+                // Handle tree selection change event here
+                System.out.println("tree " + e.getPath());
+                String fullPath = file.getAbsoluteFile().getParent();
+                for (int i = 1; i < e.getPath().getPath().length; i++) {
+                    fullPath = fullPath + "/" + e.getPath().getPath()[i].toString();
                 }
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
+                try {
+                    File file = new File(fullPath);
+                    if (!file.isDirectory()) {
+                        FileReader fr = new FileReader(file);
+                        textArea.setText(IOUtils.toString(fr));
+                        fr.close();
+                    }
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                String ext = FilenameUtils.getExtension(fullPath);
+                System.out.println(ext);
+                getSyntaxCompletions(ext);
+                // File file = new File(e.getPath().toString());
+                fileName = fullPath;
+
+
+                TreePath selectedPath = e.getPath();
+                Object selectedNode = selectedPath.getLastPathComponent();
+                // ...
             }
-          String ext = FilenameUtils.getExtension(fullPath);
-            System.out.println(ext);
-           // File file = new File(e.getPath().toString());
-            fileName =fullPath;
+        });
+        panel.add(fileTree);
+    }
+
+    public void getSyntaxCompletions(String extension) {
+
+        String mime = FileExtensionUtil.getMime(extension);
+        if (mime != null) {
+            textArea.setSyntaxEditingStyle(mime);
+         //   RSyntaxDocument document = (RSyntaxDocument) textArea.getDocument();
+
+            if (extension.toLowerCase().contains("c") ||
+                    extension.toLowerCase().contains("css") ||
+                    extension.toLowerCase().contains("groovy") ||
+                    extension.toLowerCase().contains("html") ||
+                    extension.toLowerCase().contains("java" )||
+                    extension.toLowerCase().contains("js") ||
+                    extension.toLowerCase().contains("jsp" )||
+                    extension.toLowerCase().contains("pl") ||
+                    extension.toLowerCase().contains("php") ||
+                    extension.toLowerCase().contains("sh" )||
+                    extension.toLowerCase().contains("xml")) {
 
 
-            TreePath selectedPath = e.getPath();
-            Object selectedNode = selectedPath.getLastPathComponent();
-            // ...
+                LanguageSupportFactory lsf = LanguageSupportFactory.get();
+                JavaLanguageSupport support = (JavaLanguageSupport) lsf.
+                        getSupportFor(mime);
+                CompletionProvider provider = createCompletionProvider();
+
+                AutoCompletion ac = new AutoCompletion(provider);
+                ac.install(textArea);
+                support.setAutoActivationEnabled(true);
+                support.install(textArea);
+
+            }else {
+                LanguageSupportFactory lsf = LanguageSupportFactory.get();
+                JavaLanguageSupport support = (JavaLanguageSupport) lsf.
+                        getSupportFor(mime);
+                support.uninstall(textArea);
+            }
         }
-    });
-    panel.add(fileTree);
-}
-
-public static void getCompletions(){
+    }
+public void setTextEditorTheme(String xmlfile){
 
 }
-
 }
+
+
+
+// document.setSyntaxStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
+//        Color backgroundColor = UIManager.getColor("TextArea.background");
+//        Color foregroundColor = UIManager.getColor("TextArea.foreground");
+//        Color selectionColor = UIManager.getColor("TextArea.selectionBackground");
+//        Color caretColor = UIManager.getColor("TextArea.caretForeground");
+//        textArea.setBackground(backgroundColor);
+//        textArea.setForeground(foregroundColor);
+//        textArea.setSelectionColor(selectionColor);
+//        textArea.setCurrentLineHighlightColor(new Color(204, 204, 204));
+//        textArea.setCaretColor(caretColor);

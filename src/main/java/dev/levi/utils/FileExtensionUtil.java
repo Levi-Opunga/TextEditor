@@ -3,7 +3,7 @@ package dev.levi.utils;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FileUtils {
+public class FileExtensionUtil {
 
     public static String getMime(String extension){
         Map<String, String> mimeToExtension = new HashMap<>();

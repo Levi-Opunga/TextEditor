@@ -30,20 +30,27 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
 
-        setUpTheme();
+        setUpTheme(true);
         EditorFrame frame = new EditorFrame();
     }
 
 
-    public static void setUpTheme() {
+    public static void setUpTheme(boolean darkTheme) {
+        if (darkTheme){
         try {
             UIManager.setLookAndFeel(new FlatDarculaLaf());
         } catch (UnsupportedLookAndFeelException e) {
             throw new RuntimeException(e);
+        }}else {
+            try {
+                UIManager.setLookAndFeel(new FlatIntelliJLaf());
+            } catch (UnsupportedLookAndFeelException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         uifont = generateFonts(fira,15f);
-
+        UIManager.put("ScrollPane.horizontalScrollBarPolicy",ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         UIManager.put("REditorPane.font",generateFonts(jetbrains,17f));
         UIManager.put("MenuItem.font", generateFonts(fira,12f));
         UIManager.put("Menu.font",generateFonts(droid,13f));
