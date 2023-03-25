@@ -7,6 +7,7 @@ import dev.levi.domain.Files;
 import dev.levi.presetation.components.DarkThemeFileChooser;
 import dev.levi.presetation.components.FileTree;
 import dev.levi.presetation.components.SwingHTMLBrowser;
+import dev.levi.utils.FileCopier;
 import dev.levi.utils.FileExtensionUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -128,7 +129,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     private EditorFrame instance;
 
     public EditorFrame() throws IOException {
-        initializeView("000000");
+        initializeView("App.java");
         resizeEvent();
     }
 
@@ -335,6 +336,13 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         }));
 
         JMenuItem delete = new JMenuItem("Delete File");
+        delete.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                   new File(fileName).delete();
+            }
+        });
         JMenuItem web = new JMenuItem("Browser");
         delete.setIcon(deleteIcon);
         web.setIcon(webIcon);
@@ -591,8 +599,60 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         renderer.setOpenIcon(openFolderIcon);
         renderer.setClosedIcon(closedFolderIcon);
         renderer.setLeafIcon(fileIcon);
+
+
+        fileTree.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    JPopupMenu popupMenu = new JPopupMenu();
+                    JMenuItem copy = new JMenuItem("Copy Path");
+                     copy.setIcon(generateImageIcon(new ImageIcon("Image/copy.png")));
+
+                    popupMenu.add(copy);
+                    JMenuItem delete = new JMenuItem("Delete File");
+                    JMenuItem web = new JMenuItem("Browser");
+                    delete.setIcon(deleteIcon);
+                    popupMenu.add(delete);
+                    String full = file.getAbsoluteFile().getParent();
+                    int row = fileTree.getClosestRowForLocation(e.getX(), e.getY());
+                    fileTree.setSelectionRow(row);
+
+                   // TreePath path = fileTree.getPathForRow(row);
+                    TreePath path = fileTree.getPathForLocation(e.getX(), e.getY());
+
+                    if (path != null) {
+                        Object[] nodes = path.getPath();
+                        StringBuilder fullPath = new StringBuilder();
+                        fullPath.append("/");
+                        for (int i = 1; i < nodes.length; i++) {
+                            fullPath.append(nodes[i].toString());
+                            fullPath.append("/");
+                        }
+                        // Remove trailing slash
+
+
+                        fullPath.deleteCharAt(fullPath.length() - 1);
+                        full=full+fullPath.toString();
+                       // System.out.println("Full path: " + full);
+                        }
+                    String finalFull = full;
+                    copy.addActionListener(
+                            event -> FileCopier.copyFileToClipboard(new File(finalFull))
+                    );
+                    delete.addActionListener(event ->{
+                        File file = new File(finalFull);
+                        file.delete();
+                        setUpPanel();
+                    });
+                    popupMenu.show(e.getComponent(),e.getX(),e.getY());
+                }
+            }
+        });
         fileTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
+
+
                 // Handle tree selection change event here
                 System.out.println("tree " + e.getPath());
                 String fullPath = file.getAbsoluteFile().getParent();

@@ -31,6 +31,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         setUpTheme(true);
+
         EditorFrame frame = new EditorFrame();
 //        FileDaoImpl dao = new FileDaoImpl();
 //        dao.createFile(new Files(0, "yhdhd", "gggggg/ddd/dd", System.currentTimeMillis()));

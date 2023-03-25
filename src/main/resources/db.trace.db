@@ -1,0 +1,6 @@
+2023-03-25 19:44:38 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "INSERT INTO FILES (name,time) VALUES ( ?,?) [*]WHERE path = ?"; SQL statement:
+INSERT INTO FILES (name,time) VALUES ( ?,?) WHERE path = ? [42000-214]
+2023-03-25 19:45:21 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "INSERT INTO FILES (name,time) VALUES ( ?,?) ,[*]WHERE path = ?"; expected "ROW (, (, DEFAULT, INTERSECTS (, NOT, EXISTS, UNIQUE, INTERSECTS"; SQL statement:
+INSERT INTO FILES (name,time) VALUES ( ?,?) ,WHERE path = ? [42001-214]
