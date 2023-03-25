@@ -13,6 +13,7 @@ public class SwingHTMLBrowser extends JFrame implements ActionListener, Hyperlin
 
     SwingHTMLBrowser() {
         super("Swing HTML Browser");
+        Main.setUpTheme(false);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         addressBar = new JTextField();
         addressBar.addActionListener(this);
@@ -22,6 +23,7 @@ public class SwingHTMLBrowser extends JFrame implements ActionListener, Hyperlin
         add(addressBar, BorderLayout.NORTH);
         add(new JScrollPane(pane));
         setSize(new Dimension(400, 400));
+        setVisible(true);
     }
 
     public void actionPerformed(ActionEvent evt) {
@@ -56,9 +58,4 @@ public class SwingHTMLBrowser extends JFrame implements ActionListener, Hyperlin
         }
     }
 
-    public static void main(String args[]) {
-        Main.setUpTheme(false);
-        SwingHTMLBrowser browser = new SwingHTMLBrowser();
-        browser.setVisible(true);
-    }
 }

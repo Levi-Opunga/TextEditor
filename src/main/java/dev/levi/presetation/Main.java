@@ -28,10 +28,9 @@ public class Main {
     private static Font uifont;
 
     public static void main(String[] args) throws IOException {
-
-
         setUpTheme(true);
         EditorFrame frame = new EditorFrame();
+
     }
 
 

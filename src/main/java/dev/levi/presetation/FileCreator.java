@@ -1,8 +1,6 @@
 package dev.levi.presetation;
 
 import dev.levi.presetation.components.DarkThemeFileChooser;
-import dev.levi.presetation.components.RoundedButton;
-import dev.levi.presetation.components.RoundedTextField;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -16,6 +14,7 @@ import java.io.IOException;
 public class FileCreator extends JPanel
         implements ActionListener {
     JButton go;
+
     JLabel directoryLabel =new JLabel("Select folder to create");
     JLabel fileLabel =new JLabel("File Name");
 
@@ -41,11 +40,13 @@ public class FileCreator extends JPanel
 
 
 
+
+
     public FileCreator() {
         setLayout(null);
         //setBackground(new Color(96,96,96));
 
-        go = new RoundedButton("...");
+        go = new JButton("...");
        // go.setBackground(Color.white);
         go.setFocusable(false);
         saveButton.setFocusable(false);
@@ -118,7 +119,7 @@ if(directory!=""&&filename.getText().length()>1){
     }
 
     public void chooseDirectory() {
-        JFrame frame = new JFrame("");
+        JDialog frame = new JDialog((Frame) null,"Create File");
         frame.setUndecorated(true);
         directoryLabel.setForeground(Color.WHITE);
         fileLabel.setForeground(Color.white);
@@ -131,7 +132,8 @@ if(directory!=""&&filename.getText().length()>1){
 
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.getContentPane().add(panel,"Center");
-
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+
     }
 }

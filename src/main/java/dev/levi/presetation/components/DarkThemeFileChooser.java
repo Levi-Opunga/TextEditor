@@ -7,11 +7,12 @@ import com.formdev.flatlaf.FlatLightLaf;
 import javax.swing.*;
 import javax.swing.filechooser.*;
 import java.awt.*;
+import java.io.File;
 import java.net.URL;
 
 
 public class DarkThemeFileChooser {
-    public static String chooseAnyFile(Boolean allfiles) {
+    public static String chooseAnyFile(Boolean files) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
@@ -19,13 +20,13 @@ public class DarkThemeFileChooser {
         }
 
         JFileChooser chooser = new JFileChooser();
-        if (allfiles) {
-            chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        if (files) {
+            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
         } else {
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
         }
+        chooser.setCurrentDirectory(new File("."));
         chooser.setMultiSelectionEnabled(false);
         chooser.setApproveButtonText("Select");
         chooser.setDialogTitle("Choose File");
@@ -38,8 +39,10 @@ public class DarkThemeFileChooser {
         if (result == JFileChooser.APPROVE_OPTION) {
 
             return chooser.getSelectedFile().getAbsolutePath();
-        } else {
+        } else if (result==JFileChooser.CANCEL_OPTION) {
             return "";
+        } else {
+            return DarkThemeFileChooser.chooseAnyFile(files);
         }
     }
 
