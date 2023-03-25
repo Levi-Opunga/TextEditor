@@ -159,12 +159,7 @@ getContentPane().add(scrollPane);
 
     }
     private void configureEditor() throws IOException {
-//      jEditorPane.setContentType("text/html");
-        HTMLEditorKit editorKit = new HTMLEditorKit();
-        jEditorPane.setEditorKit(editorKit);
 
-        File file = new File("./index.html");
-        jEditorPane.setPage(file.toURI().toURL());
     }
     private void configureSidePanel(){
 

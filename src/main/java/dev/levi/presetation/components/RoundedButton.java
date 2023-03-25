@@ -1,5 +1,7 @@
 package dev.levi.presetation.components;
 
+import com.formdev.flatlaf.ui.FlatTextBorder;
+
 import java.awt.*;
 import javax.swing.JButton;
 

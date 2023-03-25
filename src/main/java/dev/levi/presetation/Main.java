@@ -1,7 +1,6 @@
 package dev.levi.presetation;
 
 import dev.levi.presetation.components.DarkThemeFileChooser;
-import dev.levi.utils.Languages;
 import org.apache.commons.io.IOUtils;
 import org.netbeans.api.java.lexer.JavaTokenId;
 import org.netbeans.api.java.source.ui.DialogBinding;
@@ -17,10 +16,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 
 public class Main {
    public static File droid = new File("./Fonts/DroidSans.ttf");
@@ -31,7 +26,8 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
-        setUpdarktheme();
+
+        setUpTheme();
         EditorFrame frame = new EditorFrame();
     }
 
@@ -123,7 +119,7 @@ public class Main {
 
     }
 
-    public static void setUpdarktheme() {
+    public static void setUpTheme() {
 
 //        try {
 //            uifont = Font.createFont(Font.TRUETYPE_FONT, droid);
@@ -153,28 +149,5 @@ public class Main {
         return f;
 
     }
-
-//    public static void connectH2(){
-//        try {
-//            Connection conn = DriverManager.getConnection ("jdbc:h2:./src/main/resources/db", "sa","");
-//            Statement stmt = null;
-//            stmt = conn.createStatement();
-//            String sql =  "CREATE  TABLE IF NOT EXISTS FILES" +
-//                    "id INTEGER IDENTITY not NULL, " +
-//                    " name VARCHAR(255) NOT NULL, " +
-//                    " path VARCHAR(255) NOT NULL, " +
-//                    " time LONG NOT NULL, " +
-//                    " PRIMARY KEY ( id ))";
-//            stmt.executeUpdate(sql);
-//            System.out.println("Created table in given database...");
-//
-//            // STEP 4: Clean-up environment
-//            stmt.close();
-//            conn.close();
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
 
 }

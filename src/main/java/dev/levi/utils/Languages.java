@@ -10,6 +10,16 @@ import java.util.stream.Collectors;
 
 public class Languages {
 
+    public static List<String> list = Arrays.asList("plain", "actionscript", "asm", "asm6502", "bbcode", "c", "clojure", "cpp", "cs", "css", "csv", "d", "dockerfile", "dart", "delphi", "dtd", "fortran", "golang", "groovy", "handlebars", "hosts", "htaccess", "html", "ini", "java", "javascript", "json", "jshintrc", "jsp", "kotlin", "latex", "less", "lisp", "lua", "makefile", "markdown", "mxml", "nsis", "perl", "php", "proto", "properties", "python", "ruby", "sas", "scala", "sql", "tcl", "typescript", "unix", "vb", "bat", "xml", "yaml");
+  public static   String[] arrayOfTypes = {"text/plain", "text/actionscript", "text/asm", "text/asm6502", "text/bbcode", "text/c", "text/clojure", "text/cpp", "text/cs", "text/css", "text/csv", "text/d", "text/dockerfile", "text/dart", "text/delphi", "text/dtd", "text/fortran", "text/golang", "text/groovy", "text/handlebars", "text/hosts", "text/htaccess", "text/html", "text/ini", "text/java", "text/javascript", "text/json", "text/jshintrc", "text/jsp", "text/kotlin", "text/latex", "text/less", "text/lisp", "text/lua", "text/makefile", "text/markdown", "text/mxml", "text/nsis", "text/perl", "text/php", "text/proto", "text/properties", "text/python", "text/ruby", "text/sas", "text/scala", "text/sql", "text/tcl", "text/typescript", "text/unix", "text/vb", "text/bat", "text/xml", "text/yaml"};
+  public static  List<String> listOfTypes = List.of(arrayOfTypes);
+    public static   String[] stringArray = list.toArray(new String[list.size()]);
+//    public static String setFileType(String extension){
+//
+//
+//    }
+
+
     /**
      * Style meaning don't syntax highlight anything.
      */
@@ -342,9 +352,7 @@ public class Languages {
 
     }
 
- public static List<String> list = Arrays.asList("plain", "actionscript", "asm", "asm6502", "bbcode", "c", "clojure", "cpp", "cs", "css", "csv", "d", "dockerfile", "dart", "delphi", "dtd", "fortran", "golang", "groovy", "handlebars", "hosts", "htaccess", "html", "ini", "java", "javascript", "json", "jshintrc", "jsp", "kotlin", "latex", "less", "lisp", "lua", "makefile", "markdown", "mxml", "nsis", "perl", "php", "proto", "properties", "python", "ruby", "sas", "scala", "sql", "tcl", "typescript", "unix", "vb", "bat", "xml", "yaml");
 
-  public static   String[] stringArray = list.toArray(new String[list.size()]);
 
   private void someReflection(){
       Languages languages = new Languages();

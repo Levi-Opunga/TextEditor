@@ -1,10 +1,13 @@
 package dev.levi.presetation;
 
+import com.formdev.flatlaf.icons.FlatTreeCollapsedIcon;
+import com.formdev.flatlaf.icons.FlatTreeExpandedIcon;
+import dev.levi.presetation.components.DarkThemeFileChooser;
 import dev.levi.presetation.components.FileTree;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
-import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rsyntaxtextarea.*;
+import org.fife.ui.rtextarea.RTextScrollPane;
 import org.netbeans.api.java.lexer.JavaTokenId;
 import org.netbeans.api.lexer.Language;
 import org.openide.text.CloneableEditorSupport;
@@ -17,10 +20,12 @@ import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.EditorKit;
 import javax.swing.text.StyledDocument;
 import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import static dev.levi.presetation.Main.generateFonts;
@@ -36,19 +41,21 @@ public class EditorFrame extends JFrame {
     private JMenu help = new JMenu();
     private JMenu viewMenu = new JMenu();
     private String fileName = "000000";
+  //  TextEditorPane textArea = new TextEditorPane();
 
-    private JEditorPane pane = new JEditorPane();
 
-    private JScrollPane main = null;
+//    private JEditorPane textArea = new JEditorPane();
+
+    private RTextScrollPane main = null;
     private JScrollPane sidebar = null;
 
 
-    private JScrollPane scrollPane;
+   // private RTextScrollPane scrollPane;
     private boolean previewHtml = false;
-    private FileTree fileTree;
+    private JTree fileTree;
 
-    RSyntaxTextArea textArea = new RSyntaxTextArea();
-    RSyntaxDocument document = (RSyntaxDocument)textArea.getDocument();
+   RSyntaxTextArea textArea = new RSyntaxTextArea();
+    //RSyntaxDocument document = (RSyntaxDocument)textArea.getDocument();
 
 
     public EditorFrame getInstance() throws IOException {
@@ -87,7 +94,7 @@ public class EditorFrame extends JFrame {
         panel.setBackground(Color.black);
 
         //EditorKit kit = CloneableEditorSupport.getEditorKit("text/x-java");
-        //pane.setEditorKit(kit);
+        //textArea.setEditorKit(kit);
 
         File file = new File(fileName == "" || fileName == null ? "./error.html" : fileName);
         if (fileName == "000000") {
@@ -96,35 +103,18 @@ public class EditorFrame extends JFrame {
         }
         System.out.println(fileName);
         setUpPanel();
-        pane.setForeground(Color.white);
+        textArea.setForeground(Color.white);
+
         try {
-            pane.setPage(file.toURI().toURL());
+            textArea.setText(FileUtils.readFileToString(file, StandardCharsets.UTF_8));
             fileName = file.toURI().toURL().toString();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-//        try {
-//            SwingUtilities.invokeAndWait(new Runnable() {
-//
-//                public void run() {
-//                    try (FileReader fileReader = new FileReader(file)) {
-//
-//                        String text = IOUtils.toString(fileReader);
-//                        // Add the text to the document
-//                        doc.insertString(0, text, null);
-//
-//                    } catch (BadLocationException | IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            });
-//        } catch (Exception e) {
-//            System.out.println("Exception when constructing document: " + e);
-//            System.exit(1);
-//        }
+
         setSize(600, 600);
-        pane.setPage(file.toURI().toURL());
+        textArea.setText(FileUtils.readFileToString(file, StandardCharsets.UTF_8));
         int height = getSize().height;
         int width = getSize().width;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -133,13 +123,27 @@ public class EditorFrame extends JFrame {
         textArea.setCodeFoldingEnabled(true);
 
         RSyntaxDocument document = (RSyntaxDocument) textArea.getDocument();
-        document.setSyntaxStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
-        textArea.setFont(Main.generateFonts(Main.jetbrains,15F));
+        // document.setSyntaxStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
+        Color backgroundColor = UIManager.getColor("TextArea.background");
+        Color foregroundColor = UIManager.getColor("TextArea.foreground");
+        Color selectionColor = UIManager.getColor("TextArea.selectionBackground");
+        Color caretColor = UIManager.getColor("TextArea.caretForeground");
+        textArea.setBackground(backgroundColor);
+        textArea.setForeground(foregroundColor);
+        textArea.setSelectionColor(selectionColor);
+        textArea.setCurrentLineHighlightColor(new Color(204, 204, 204));
+        textArea.setCaretColor(caretColor);
+        textArea.setFont(Main.generateFonts(Main.fira,20F));
+        try {
+            Theme theme = Theme.load(getClass().getResourceAsStream(
+                    "/org/fife/ui/rsyntaxtextarea/themes/monokai.xml"));
+            theme.apply(textArea);
+        } catch (IOException ioe) { // Never happens
+            ioe.printStackTrace();
+        }
 
-
-        JScrollPane scrollPane = new JScrollPane(textArea);
         sidebar = new JScrollPane(fileTree);
-        main = new JScrollPane(textArea);
+        main = new RTextScrollPane(textArea);
       //  sidebar.setSize((int) (width * .2), height);
         sidebar.setBounds(0, 0, (int) (width * .2), height);
         main.setBounds((int) (width * .2), 0, (int) (width * .8), height);
@@ -214,7 +218,7 @@ public class EditorFrame extends JFrame {
                 try {
                     File file = new File(fileName);
                     FileWriter fr = new FileWriter(file);
-                    fr.write(pane.getText());
+                    fr.write(textArea.getText());
                     fr.close();
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
@@ -242,11 +246,11 @@ public class EditorFrame extends JFrame {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        try {
-                            htmlPreview();
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
-                        }
+//                        try {
+//                          //  htmlPreview();
+//                        } catch (IOException ex) {
+//                            throw new RuntimeException(ex);
+//                        }
                     }
                 }
 
@@ -258,32 +262,31 @@ public class EditorFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 System.out.println("here");
-                JFileChooser fc = new JFileChooser();
-                int i = fc.showOpenDialog(null);
-                if (i == JFileChooser.APPROVE_OPTION) {
-                    File f = fc.getSelectedFile();
+                DarkThemeFileChooser fc = new DarkThemeFileChooser();
+
+                    File f = new File(fc.chooseAnyFile(true));
                     try {
-                        pane.setText(IOUtils.toString(new FileReader(f)));
+                        textArea.setText(IOUtils.toString(new FileReader(f)));
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     }
                     String filepath = f.getPath();
-
                     fileName = filepath;
+                    setUpPanel();
 //                    try {
 //                        BufferedReader br = new BufferedReader(new FileReader(filepath));
 //                        String s1 = "", s2 = "";
 //                        while ((s1 = br.readLine()) != null) {
 //                            s2 += s1 + "\n";
 //                        }
-//                       // pane.setText(s2);
+//                       // textArea.setText(s2);
 //                        fileName = filepath;
 //                        br.close();
 //                    } catch (Exception ex) {
 //                        ex.printStackTrace();
 //                    }
                 }
-            }
+
         });
         saveFile.addActionListener(
                 new ActionListener() {
@@ -294,7 +297,7 @@ public class EditorFrame extends JFrame {
                         try {
                             File file = new File(fileName);
                             FileWriter fr = new FileWriter(file);
-                            fr.write(pane.getText());
+                            fr.write(textArea.getText());
                             fr.close();
                         } catch (IOException ex) {
                             throw new RuntimeException(ex);
@@ -313,70 +316,69 @@ public class EditorFrame extends JFrame {
 
 
     }
+//
+//    private void htmlPreview() throws IOException {
+//        if (previewHtml == false) {
+//            if (fileName.contains("html") || fileName.contains("htm")) {
+//                textArea.setContentType("text/html");
+//                HTMLEditorKit editorKit = new HTMLEditorKit();
+//                textArea.setEditorKit(editorKit);
+//
+//                File file = new File(fileName);
+//                textArea.setPage(file.toURI().toURL());
+//                textArea.setEditable(false);
+//                previewHtml=!previewHtml;
+//            }
+//        } else {
+//            textArea.setContentType("text/plain");
+//            previewHtml=!previewHtml;
+//            File file = new File(fileName);
+//            FileReader reader = new FileReader(file);
+//            textArea.setText(IOUtils.toString(reader));
+//            textArea.setEditable(true);
+//        }
+//    }
 
-    private void htmlPreview() throws IOException {
-        if (previewHtml == false) {
-            if (fileName.contains("html") || fileName.contains("htm")) {
-                pane.setContentType("text/html");
-                HTMLEditorKit editorKit = new HTMLEditorKit();
-                pane.setEditorKit(editorKit);
-
-                File file = new File(fileName);
-                pane.setPage(file.toURI().toURL());
-                pane.setEditable(false);
-                previewHtml=!previewHtml;
-            }
-        } else {
-            pane.setContentType("text/plain");
-            previewHtml=!previewHtml;
-            File file = new File(fileName);
-            FileReader reader = new FileReader(file);
-            pane.setText(IOUtils.toString(reader));
-            pane.setEditable(true);
-        }
-    }
-
-    private void javaPresent(String javaFile) {
-        StyledDocument doc = new DefaultStyledDocument();
-        doc.putProperty(Language.class, JavaTokenId.language());
-
-        EditorKit kit = CloneableEditorSupport.getEditorKit("text/x-java");
-        pane.setEditorKit(kit);
+    private void presentationMode(String javaFile) {
 
         File file = new File(javaFile);
+
         try {
-            pane.setPage(file.toURI().toURL());
+            textArea.setText(FileUtils.readFileToString(file, StandardCharsets.UTF_8));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-
-                public void run() {
-                    try (FileReader fileReader = new FileReader(file)) {
-
-                        String text = IOUtils.toString(fileReader);
-                        // Add the text to the document
-                        doc.insertString(0, text, null);
-
-                    } catch (BadLocationException | IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-        } catch (Exception e) {
-            System.out.println("Exception when constructing document: " + e);
-            System.exit(1);
-        }
-        setSize(600, 600);
-        pane.setDocument(doc);
+        setSize(10000, 10000);
 
 
     }
 public void setUpPanel() {
-    File file = new File("./file.html");
+    File file = new File(fileName);
     fileTree = new FileTree(file.getAbsoluteFile().getParent());
+  //  JTree tree = new JTree(rootNode);
+
+    // Customize the tree cell renderer to use FlatLaf icons
+    DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) fileTree.getCellRenderer();
+
+    ImageIcon closed = new ImageIcon("./Images/folder.png");
+    Image image = closed.getImage();
+    Image newImg = image.getScaledInstance(20, 20,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
+    closed = new ImageIcon(newImg);
+
+    ImageIcon open = new ImageIcon("./Images/open.png");
+    Image image2 = open.getImage();
+    Image newImg2 = image.getScaledInstance(20, 20,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
+    open = new ImageIcon(newImg2);
+
+    ImageIcon fileIcon = new ImageIcon("./Images/file.png");
+    Image iconImage = fileIcon.getImage();
+    Image image1 = iconImage.getScaledInstance(20, 20,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
+    fileIcon = new ImageIcon(image1);
+
+    renderer.setOpenIcon(open);
+    renderer.setClosedIcon(closed);
+    renderer.setLeafIcon(fileIcon);
     fileTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
         public void valueChanged(TreeSelectionEvent e) {
             // Handle tree selection change event here
@@ -389,7 +391,7 @@ public void setUpPanel() {
                 File file = new File(fullPath);
                 if (!   file.isDirectory()) {
                 FileReader fr = new FileReader(file);
-                pane.setText(IOUtils.toString(fr));
+                textArea.setText(IOUtils.toString(fr));
                 fr.close();
                 }
             } catch (IOException ex) {

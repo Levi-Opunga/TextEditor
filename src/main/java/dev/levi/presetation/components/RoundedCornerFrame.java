@@ -12,7 +12,7 @@ public class RoundedCornerFrame extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
         setUndecorated(true);
-        setBackground(new Color(0, 0, 0, 0));
+     //   setBackground(new Color(0, 0, 0, 0));
 
         // Create a round rectangle shape with 20 pixel corner radius
         Shape shape = new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 20, 20);
@@ -35,11 +35,4 @@ public class RoundedCornerFrame extends JFrame {
         setOpacity(0.8f);
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            // Create and show the rounded corner frame
-            RoundedCornerFrame frame = new RoundedCornerFrame("Rounded Corner Frame");
-            frame.setVisible(true);
-        });
-    }
 }

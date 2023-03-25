@@ -19,12 +19,12 @@ public class FileCreator extends JPanel
     JLabel directoryLabel =new JLabel("Select folder to create");
     JLabel fileLabel =new JLabel("File Name");
 
-    RoundedTextField filename =new RoundedTextField(20);
+    TextField filename =new TextField(20);
     String directory="";
 
     JFileChooser chooser;
     String choosertitle;
-    JButton saveButton =new RoundedButton("save");
+    JButton saveButton =new JButton("save");
     private Font uifont;
 
       {
@@ -43,7 +43,7 @@ public class FileCreator extends JPanel
 
     public FileCreator() {
         setLayout(null);
-        setBackground(new Color(96,96,96));
+        //setBackground(new Color(96,96,96));
 
         go = new RoundedButton("...");
        // go.setBackground(Color.white);
@@ -108,26 +108,7 @@ if(directory!=""&&filename.getText().length()>1){
     }
 
     public void actionPerformed(ActionEvent e) {
-//        chooser = new JFileChooser();
-//        chooser.setCurrentDirectory(new java.io.File("."));
-//        chooser.setDialogTitle(choosertitle);
-//        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-//        //
-//        // disable the "All files" option.
-//        //
-//        chooser.setAcceptAllFileFilterUsed(false);
-//        //
-//        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-//            System.out.println("getCurrentDirectory(): "
-//                    +  chooser.getCurrentDirectory());
-//            System.out.println("getSelectedFile() : "
-//                    +  chooser.getSelectedFile());
-//            directory=chooser.getSelectedFile().getAbsolutePath();
-//            System.out.println(directory);
-//        }
-//        else {
-//            System.out.println("No Selection ");
-//        }
+
         directory= DarkThemeFileChooser.chooseAnyFile(false);
 
     }
