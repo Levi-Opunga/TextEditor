@@ -1,5 +1,7 @@
 package dev.levi.presetation;
 
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import dev.levi.presetation.components.DarkThemeFileChooser;
 import dev.levi.presetation.components.FileTree;
 import dev.levi.presetation.components.SwingHTMLBrowser;
@@ -49,21 +51,21 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     private JMenu fileMenu = new JMenu();
     private JMenu view = new JMenu();
     private JMenu settings = new JMenu();
-    private JMenu edit = new JMenu();
+    private JMenu features = new JMenu();
     private JMenu help = new JMenu();
     private JMenu viewMenu = new JMenu();
     private JLabel tab = new JLabel();
 
-    private String fileName = "000000";
+    private static String fileName = "000000";
     //  TextEditorPane textArea = new TextEditorPane();
     public static ImageIcon openFolderIcon = generateImageIcon(new ImageIcon("./Images/open.png"));
     public static ImageIcon fileIcon = generateImageIcon(new ImageIcon("./Images/file.png"));
-    public static ImageIcon closedFolderIcon = generateImageIcon( new ImageIcon("./Images/folder.png"));
-    public static ImageIcon settingsIcon = generateImageIcon( new ImageIcon("./Images/settings.png"));
-    public static ImageIcon deleteIcon =generateImageIcon(new ImageIcon("./Images/delete.png"));
+    public static ImageIcon closedFolderIcon = generateImageIcon(new ImageIcon("./Images/folder.png"));
+    public static ImageIcon settingsIcon = generateImageIcon(new ImageIcon("./Images/settings.png"));
+    public static ImageIcon deleteIcon = generateImageIcon(new ImageIcon("./Images/delete.png"));
     public static ImageIcon helpIcon = generateImageIcon(new ImageIcon("./Images/help.png"));
     public static ImageIcon previewIcon = generateImageIcon(new ImageIcon("./Images/preview.png"));
-    public static ImageIcon webIcon =generateImageIcon(new ImageIcon("./Images/browser.gif"));
+    public static ImageIcon webIcon = generateImageIcon(new ImageIcon("./Images/browser.gif"));
     private static int windowCount = 0;
 
     public EditorFrame(Action action) {
@@ -76,10 +78,10 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     }
 
 
-    public static ImageIcon generateImageIcon(ImageIcon imageIcon){
-Image image = imageIcon.getImage();
-image = image.getScaledInstance(20,20,Image.SCALE_SMOOTH);
-return new ImageIcon(image);
+    public static ImageIcon generateImageIcon(ImageIcon imageIcon) {
+        Image image = imageIcon.getImage();
+        image = image.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+        return new ImageIcon(image);
     }
 
     private RTextScrollPane main = null;
@@ -90,14 +92,19 @@ return new ImageIcon(image);
     private boolean previewHtml = false;
     private JTree fileTree;
 
+
     RSyntaxTextArea textArea = new RSyntaxTextArea();
     //RSyntaxDocument document = (RSyntaxDocument)textArea.getDocument();
 
 
-    public EditorFrame getInstance() throws IOException {
+    public EditorFrame getInstance(String name,int width,int height) throws IOException {
         if (instance == null) {
-            return new EditorFrame();
+            EditorFrame editorFrame =new EditorFrame(name);
+            editorFrame.setSize(width,height);
+            return editorFrame;
+
         } else {
+            instance.setSize(width,height);
             return instance;
         }
 
@@ -219,11 +226,6 @@ return new ImageIcon(image);
     }
 
 
-    private void setClickLISTener() {
-
-    }
-
-
     private void resizeEvent() {
         addComponentListener(new ComponentListener() {
 
@@ -232,11 +234,7 @@ return new ImageIcon(image);
                 if (main != null) {
                     int height = e.getComponent().getSize().height;
                     int width = e.getComponent().getSize().width;
-                    setLayout(null);
-                    // sidebar.setSize((int) (width * .2), height);
-                    sidebar.setBounds(0, 0, (int) (width * .2), height);
-                    main.setBounds((int) (width * .2), 30, (int) (width * .8), height - 30);
-
+                    resizeHelper(height, width);
                 }
             }
 
@@ -257,14 +255,32 @@ return new ImageIcon(image);
         });
     }
 
+    private void resizeHelper(int height, int width) {
+        if(!sidebar.isVisible()){
+
+            tab.setBounds(0, 0, width, 30);
+
+            //sidebar.setBounds(0, 0, (int) (width * .2), height);
+            main.setBounds(0, 30, width, height - 30);
+        }else {
+
+            // sidebar.setSize((int) (width * .2), height);
+            tab.setBounds((int) (width * .2), 0, (int) (width * .8), 30);
+
+            sidebar.setBounds(0, 0, (int) (width * .2), height);
+            main.setBounds((int) (width * .2), 30, (int) (width * .8), height - 30);
+        }
+    }
+
 
     private void configureMenu() {
+
         fileMenu.setText("File");
         view.setText("View");
-        edit.setText("Edit");
-        settings.setText("Settings ");
+        features.setText("Features");
+
         help.setText("Help");
-        JMenu[] menus = {fileMenu, view, edit, settings, help};
+        JMenu[] menus = {fileMenu, view, features, help};
         Arrays.stream(menus).forEach(item ->
                 {
                     bar.add(item);
@@ -272,9 +288,58 @@ return new ImageIcon(image);
                 }
         );
 
-        JMenuItem settings = new JMenuItem("New file");
+        JMenu settings = new JMenu("Settings");
+        JMenu appTheme = new JMenu("App Theme");
+        settings.add(appTheme);
+        JMenuItem light = new JMenuItem("Light");
+        JMenuItem dark = new JMenuItem("Dark");
+        appTheme.add(light);
+        appTheme.add(dark);
+        light.addActionListener((actionEvent -> {
+            Timer timer = new Timer(1000, e -> {
+                Main.setUpTheme(false);
 
+                dispose();
+                try {
+                    getInstance(fileName,getWidth(),getHeight());
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
+            timer.setRepeats(false);
+            timer.start();
+        }
+        ));
 
+        dark.addActionListener((actionEvent -> {
+            Timer timer = new Timer(1000, e -> {
+                Main.setUpTheme(true);
+
+                dispose();
+                try {
+                    getInstance(fileName,getWidth(),getHeight());
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
+            timer.setRepeats(false);
+            timer.start();
+        }));
+
+        JMenuItem delete = new JMenuItem("Delete File");
+        JMenuItem web = new JMenuItem("Browser");
+        delete.setIcon(deleteIcon);
+        web.setIcon(webIcon);
+        settings.setIcon(settingsIcon);
+
+        JMenuItem sidebarMenuItem = new JMenuItem("Toggle Sidebar");
+        sidebarMenuItem.addActionListener((e) -> {
+            sidebar.setVisible(!sidebar.isVisible());
+            int width = getWidth();
+            int height = getHeight();
+            resizeHelper(height, width);
+        });
+        view.add(sidebarMenuItem);
         JMenuItem newFile = new JMenuItem("New file");
         newFile.setIcon(fileIcon);
         JMenuItem openExistingFile = new JMenuItem("Open file");
@@ -335,11 +400,7 @@ return new ImageIcon(image);
 
 
                 File f = new File(DarkThemeFileChooser.chooseAnyFile(true));
-//                try {
-//                    textArea.setText(IOUtils.toString(new FileReader(f)));
-//                } catch (IOException ex) {
-//                    throw new RuntimeException(ex);
-//                }
+
                 fileName = f.getPath();
                 Thread thread = new Thread(() -> {
                     try {
@@ -379,8 +440,10 @@ return new ImageIcon(image);
 
         fileMenu.add(newFile);
         fileMenu.add(openExistingFile);
+        fileMenu.add(settings);
         fileMenu.add(openRecentFile);
         fileMenu.add(saveFile);
+        fileMenu.add(delete);
 
         view.add(htmlPreview);
 
@@ -568,7 +631,10 @@ return new ImageIcon(image);
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         if (actionEvent.getActionCommand().equals("exit")) {
-
+            int number = JOptionPane.showConfirmDialog(null, "Are you sure you want to exit?");
+            if (number == 0) {
+                System.exit(0);
+            }
         }
     }
 
