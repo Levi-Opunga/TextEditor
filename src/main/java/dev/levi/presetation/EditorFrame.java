@@ -35,14 +35,18 @@ import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -59,21 +63,25 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     private JMenu help = new JMenu();
     private JMenu viewMenu = new JMenu();
     private JLabel tab = new JLabel();
+    private static int openWindowCount = 0;
 
     private static String fileName = "000000";
     //  TextEditorPane textArea = new TextEditorPane();
     public static ImageIcon openFolderIcon = generateImageIcon(new ImageIcon("./Images/open.png"));
     public static ImageIcon fileIcon = generateImageIcon(new ImageIcon("./Images/file.png"));
+    public static ImageIcon recentIcon = generateImageIcon(new ImageIcon("./Images/recent.png"));
+    public static ImageIcon onIcon = generateImageIcon(new ImageIcon("./Images/off-button.png"));
+    public static ImageIcon offIcon = generateImageIcon(new ImageIcon("./Images/on-button.png"));
     public static ImageIcon closedFolderIcon = generateImageIcon(new ImageIcon("./Images/folder.png"));
     public static ImageIcon settingsIcon = generateImageIcon(new ImageIcon("./Images/settings.png"));
     public static ImageIcon deleteIcon = generateImageIcon(new ImageIcon("./Images/delete.png"));
+    public static ImageIcon saveIcon = generateImageIcon(new ImageIcon("./Images/floppy.png"));
     public static ImageIcon helpIcon = generateImageIcon(new ImageIcon("./Images/help.png"));
     public static ImageIcon previewIcon = generateImageIcon(new ImageIcon("./Images/preview.png"));
-    public static ImageIcon webIcon = generateImageIcon(new ImageIcon("./Images/browser.gif"));
+    public static ImageIcon webIcon = generateImageIcon(new ImageIcon("./Images/browser.png"));
     private static int windowCount = 0;
-    private  FileDaoImpl dao =  dao = new FileDaoImpl();
+    private FileDaoImpl dao = dao = new FileDaoImpl();
     List<Files> recentlyOpenedFiles = (List<Files>) dao.findAllFiles();
-
 
 
     public EditorFrame(Action action) {
@@ -81,17 +89,26 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     }
 
     {
-        windowCount = windowCount + 1;
-        System.out.println("window " + windowCount);
+        java.util.Timer timer = new java.util.Timer();
+
+        TimerTask task = new TimerTask() {
+            public void run() {
+                try {
+                    File file = new File(fileName);
+                    FileWriter fr = new FileWriter(file);
+                    fr.write(textArea.getText());
+                    fr.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+        timer.schedule(task, 1000, 1000);
+
+
+
     }
-
-
-    public static ImageIcon generateImageIcon(ImageIcon imageIcon) {
-        Image image = imageIcon.getImage();
-        image = image.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-        return new ImageIcon(image);
-    }
-
+    JMenuItem sidebarMenuItem;
     private RTextScrollPane main = null;
     private JScrollPane sidebar = null;
 
@@ -108,6 +125,8 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     public EditorFrame getInstance(String name, int width, int height) throws IOException {
         if (instance == null) {
             EditorFrame editorFrame = new EditorFrame(name);
+            openWindowCount++;
+
             editorFrame.setSize(width, height);
             return editorFrame;
 
@@ -124,6 +143,8 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         System.out.println("df6 " + fileName);
         initializeView(fileName);
         resizeEvent();
+        openWindowCount++;
+
     }
 
     private EditorFrame instance;
@@ -131,10 +152,20 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     public EditorFrame() throws IOException {
         initializeView("App.java");
         resizeEvent();
+        openWindowCount++;
+
     }
 
     public void initializeView(String fileName) throws IOException {
-
+        // Add window listener to decrease count when the frame is closed
+        addWindowListener(new WindowAdapter() {
+            public void windowClosed(WindowEvent e) {
+                openWindowCount--;
+                if (openWindowCount == 0) {
+                    System.exit(0); // Exit only when there are no more open windows
+                }
+            }
+        });
 
         panel.setBackground(Color.black);
 
@@ -268,9 +299,10 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         if (!sidebar.isVisible()) {
 
             tab.setBounds(0, 0, width, 30);
-
+            sidebarMenuItem.setIcon(onIcon);
             //sidebar.setBounds(0, 0, (int) (width * .2), height);
             main.setBounds(0, 30, width, height - 30);
+
         } else {
 
             // sidebar.setSize((int) (width * .2), height);
@@ -278,6 +310,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
             sidebar.setBounds(0, 0, (int) (width * .2), height);
             main.setBounds((int) (width * .2), 30, (int) (width * .8), height - 30);
+            sidebarMenuItem.setIcon(offIcon);
         }
     }
 
@@ -340,12 +373,24 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                   new File(fileName).delete();
+                new File(fileName).delete();
+                setUpPanel();
+                ((DefaultTreeModel) fileTree.getModel()).reload();
+
             }
         });
         JMenuItem web = new JMenuItem("Browser");
+        web.setIcon(webIcon);
+        web.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                SwingHTMLBrowser swingHTMLBrowser = new SwingHTMLBrowser("https://google.com");
+
+            }
+        });
         delete.setIcon(deleteIcon);
         web.setIcon(webIcon);
+        features.add(web);
         settings.setIcon(settingsIcon);
         JMenu editorStyle = new JMenu("Editor Colors");
         settings.add(editorStyle);
@@ -438,7 +483,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
         });
 
-        JMenuItem sidebarMenuItem = new JMenuItem("Toggle Sidebar");
+        sidebarMenuItem = new JMenuItem("Toggle Sidebar");
         sidebarMenuItem.addActionListener((e) -> {
             sidebar.setVisible(!sidebar.isVisible());
             int width = getWidth();
@@ -449,11 +494,57 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         JMenuItem newFile = new JMenuItem("New file");
         newFile.setIcon(fileIcon);
         JMenuItem openExistingFile = new JMenuItem("Open file");
-        openExistingFile.setIcon(closedFolderIcon);
-
+        openExistingFile.setIcon(fileIcon);
+        JMenuItem openFolder = new JMenuItem("Open folder");
+        openFolder.setIcon(closedFolderIcon);
         JMenu openRecentFile = new JMenu("Recent Files");
-        List<JMenuItem> items = recentlyOpenedFiles.stream().map(e->new JMenuItem(e.getPath())).toList();
+        openRecentFile.setIcon(recentIcon);
+        JMenuItem reademe = new JMenuItem("Guide");
+        reademe.setIcon(helpIcon);
+        reademe.addActionListener(e ->
+        {
+            URI uri = null;
+            try {
+                uri = new URI("https://github.com/Levi-Opunga/TextEditor");
+            } catch (URISyntaxException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            // Use the Desktop class to open the URI in the user's default browser
+            try {
+                Desktop.getDesktop().browse(uri);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        help.add(reademe);
+
+
+        List<JMenuItem> items = recentlyOpenedFiles.stream().map(e -> new JMenuItem(e.getPath())).toList();
         items.forEach(openRecentFile::add);
+
+        for (int i = 0; i < items.size(); i++) {
+            int finalI = i;
+
+            items.get(i).addActionListener(e -> {
+                Thread thread = new Thread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        try {
+                            dao.updateFile(recentlyOpenedFiles.get(finalI));
+                            new EditorFrame(recentlyOpenedFiles.get(finalI).getPath());
+
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }
+                });
+                thread.start();
+
+            });
+
+        }
 
 
         JMenuItem saveFile = new JMenuItem("Save");
@@ -496,6 +587,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         );
 
         JMenuItem htmlPreview = new JMenuItem("Preview Html");
+        htmlPreview.setIcon(previewIcon);
         htmlPreview.addActionListener(
                 new ActionListener() {
                     @Override
@@ -520,6 +612,37 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                 fileName = f.getPath();
                 Thread thread = new Thread(() -> {
                     try {
+                        dao.createFile(new Files(0,fileName,fileName,System.currentTimeMillis()));
+
+                        EditorFrame frame = new EditorFrame(fileName);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
+                    System.out.println("Thread Running");
+                });
+                thread.start();
+//                executor.submit(thread);
+//                System.out.println("here  " + fileName);
+                setUpPanel();
+
+            }
+
+        });
+        openFolder.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                // DarkThemeFileChooser fc = new DarkThemeFileChooser();
+
+
+                File f = new File(DarkThemeFileChooser.chooseAnyFile(false));
+
+                fileName = f.getPath();
+                Thread thread = new Thread(() -> {
+                    try {
+                        dao.createFile(new Files(0,fileName,fileName,System.currentTimeMillis()));
+
                         EditorFrame frame = new EditorFrame(fileName);
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
@@ -553,9 +676,10 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
                 }
         );
-
+        saveFile.setIcon(saveIcon);
         fileMenu.add(newFile);
         fileMenu.add(openExistingFile);
+        fileMenu.add(openFolder);
         fileMenu.add(settings);
         fileMenu.add(openRecentFile);
         fileMenu.add(saveFile);
@@ -584,8 +708,10 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
     public void setUpPanel() {
         File file = new File(fileName);
+
         if (file.isDirectory()) {
             fileTree = new FileTree(file.toURI().getPath());
+
         } else {
             fileTree = new FileTree(file.getAbsoluteFile().getParent());
         }
@@ -600,87 +726,176 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         renderer.setClosedIcon(closedFolderIcon);
         renderer.setLeafIcon(fileIcon);
 
+        if (!file.isDirectory()) {
+            fileTree.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (SwingUtilities.isRightMouseButton(e)) {
+                        JPopupMenu popupMenu = new JPopupMenu();
+                        JMenuItem copy = new JMenuItem("Copy Path");
+                        copy.setIcon(generateImageIcon(new ImageIcon("Images/copy.png")));
 
-        fileTree.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    JPopupMenu popupMenu = new JPopupMenu();
-                    JMenuItem copy = new JMenuItem("Copy Path");
-                     copy.setIcon(generateImageIcon(new ImageIcon("Image/copy.png")));
+                        popupMenu.add(copy);
+                        JMenuItem delete = new JMenuItem("Delete File");
+                        //  JMenuItem web = new JMenuItem("Browser");
+                        delete.setIcon(deleteIcon);
+                        popupMenu.add(delete);
+                        String full = file.getAbsoluteFile().getParent();
+                        int row = fileTree.getClosestRowForLocation(e.getX(), e.getY());
+                        fileTree.setSelectionRow(row);
 
-                    popupMenu.add(copy);
-                    JMenuItem delete = new JMenuItem("Delete File");
-                    JMenuItem web = new JMenuItem("Browser");
-                    delete.setIcon(deleteIcon);
-                    popupMenu.add(delete);
-                    String full = file.getAbsoluteFile().getParent();
-                    int row = fileTree.getClosestRowForLocation(e.getX(), e.getY());
-                    fileTree.setSelectionRow(row);
+                        // TreePath path = fileTree.getPathForRow(row);
+                        TreePath path = fileTree.getPathForLocation(e.getX(), e.getY());
 
-                   // TreePath path = fileTree.getPathForRow(row);
-                    TreePath path = fileTree.getPathForLocation(e.getX(), e.getY());
-
-                    if (path != null) {
-                        Object[] nodes = path.getPath();
-                        StringBuilder fullPath = new StringBuilder();
-                        fullPath.append("/");
-                        for (int i = 1; i < nodes.length; i++) {
-                            fullPath.append(nodes[i].toString());
+                        if (path != null) {
+                            Object[] nodes = path.getPath();
+                            StringBuilder fullPath = new StringBuilder();
                             fullPath.append("/");
+                            for (int i = 1; i < nodes.length; i++) {
+                                fullPath.append(nodes[i].toString());
+                                fullPath.append("/");
+                            }
+                            // Remove trailing slash
+
+
+                            fullPath.deleteCharAt(fullPath.length() - 1);
+                            full = full + fullPath.toString();
+                            // System.out.println("Full path: " + full);
                         }
-                        // Remove trailing slash
+                        String finalFull = full;
+                        copy.addActionListener(
+                                event -> FileCopier.copyFileToClipboard(new File(finalFull))
+                        );
+                        delete.addActionListener(event -> {
+                            File file = new File(finalFull);
+                            file.delete();
+                            setUpPanel();
+                            ((DefaultTreeModel) fileTree.getModel()).reload();
 
-
-                        fullPath.deleteCharAt(fullPath.length() - 1);
-                        full=full+fullPath.toString();
-                       // System.out.println("Full path: " + full);
-                        }
-                    String finalFull = full;
-                    copy.addActionListener(
-                            event -> FileCopier.copyFileToClipboard(new File(finalFull))
-                    );
-                    delete.addActionListener(event ->{
-                        File file = new File(finalFull);
-                        file.delete();
-                        setUpPanel();
-                    });
-                    popupMenu.show(e.getComponent(),e.getX(),e.getY());
-                }
-            }
-        });
-        fileTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
-            public void valueChanged(TreeSelectionEvent e) {
-
-
-                // Handle tree selection change event here
-                System.out.println("tree " + e.getPath());
-                String fullPath = file.getAbsoluteFile().getParent();
-                for (int i = 1; i < e.getPath().getPath().length; i++) {
-                    fullPath = fullPath + "/" + e.getPath().getPath()[i].toString();
-                }
-                try {
-                    File file = new File(fullPath);
-                    if (!file.isDirectory()) {
-                        FileReader fr = new FileReader(file);
-                        textArea.setText(IOUtils.toString(fr));
-                        fr.close();
+                        });
+                        popupMenu.show(e.getComponent(), e.getX(), e.getY());
                     }
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
                 }
-                String ext = FilenameUtils.getExtension(fullPath);
-                System.out.println(ext);
-                getSyntaxCompletions(ext);
-                // File file = new File(e.getPath().toString());
-                fileName = fullPath;
+            });
+            fileTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
+                public void valueChanged(TreeSelectionEvent e) {
 
-                tab.setText(fullPath);
-                TreePath selectedPath = e.getPath();
-                Object selectedNode = selectedPath.getLastPathComponent();
-                // ...
-            }
-        });
+
+                    // Handle tree selection change event here
+                    System.out.println("tree " + e.getPath());
+                    String fullPath = file.getAbsoluteFile().getParent();
+                    for (int i = 1; i < e.getPath().getPath().length; i++) {
+                        fullPath = fullPath + "/" + e.getPath().getPath()[i].toString();
+                    }
+                    try {
+                        File file = new File(fullPath);
+                        if (!file.isDirectory()) {
+                            FileReader fr = new FileReader(file);
+                            textArea.setText(IOUtils.toString(fr));
+                            fr.close();
+                        }
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    String ext = FilenameUtils.getExtension(fullPath);
+                    System.out.println(ext);
+                    getSyntaxCompletions(ext);
+                    // File file = new File(e.getPath().toString());
+                    fileName = fullPath;
+
+                    tab.setText(fullPath);
+                    TreePath selectedPath = e.getPath();
+                    Object selectedNode = selectedPath.getLastPathComponent();
+                    // ...
+                }
+            });
+        } else {
+
+            fileTree.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (SwingUtilities.isRightMouseButton(e)) {
+                        JPopupMenu popupMenu = new JPopupMenu();
+                        JMenuItem copy = new JMenuItem("Copy Path");
+                        copy.setIcon(generateImageIcon(new ImageIcon("Images/copy.png")));
+
+                        popupMenu.add(copy);
+                        JMenuItem delete = new JMenuItem("Delete File");
+                        //  JMenuItem web = new JMenuItem("Browser");
+                        delete.setIcon(deleteIcon);
+                        popupMenu.add(delete);
+                        String full = file.getAbsoluteFile().getParent();
+                        int row = fileTree.getClosestRowForLocation(e.getX(), e.getY());
+                        fileTree.setSelectionRow(row);
+
+                        // TreePath path = fileTree.getPathForRow(row);
+                        TreePath path = fileTree.getPathForLocation(e.getX(), e.getY());
+
+                        if (path != null) {
+                            Object[] nodes = path.getPath();
+                            StringBuilder fullPath = new StringBuilder();
+                            fullPath.append("/");
+                            for (int i = 0; i < nodes.length; i++) {
+                                fullPath.append(nodes[i].toString());
+                                fullPath.append("/");
+                            }
+                            // Remove trailing slash
+
+
+                            fullPath.deleteCharAt(fullPath.length() - 1);
+                            full = full + fullPath.toString();
+                            // System.out.println("Full path: " + full);
+                        }
+                        String finalFull = full;
+                        copy.addActionListener(
+                                event -> FileCopier.copyFileToClipboard(new File(finalFull))
+                        );
+                        delete.addActionListener(event -> {
+                            File file = new File(finalFull);
+                            file.delete();
+                            setUpPanel();
+                            ((DefaultTreeModel) fileTree.getModel()).reload();
+
+                        });
+                        popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                    }
+                }
+            });
+            fileTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
+                public void valueChanged(TreeSelectionEvent e) {
+
+
+                    // Handle tree selection change event here
+                    System.out.println("tree " + e.getPath());
+                    String fullPath = file.getAbsoluteFile().getParent();
+                    for (int i = 0; i < e.getPath().getPath().length; i++) {
+                        fullPath = fullPath + "/" + e.getPath().getPath()[i].toString();
+                    }
+                    try {
+                        File file = new File(fullPath);
+                        if (!file.isDirectory()) {
+                            FileReader fr = new FileReader(file);
+                            textArea.setText(IOUtils.toString(fr));
+                            fr.close();
+                        }
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    String ext = FilenameUtils.getExtension(fullPath);
+                    System.out.println(ext);
+                    getSyntaxCompletions(ext);
+                    // File file = new File(e.getPath().toString());
+                    fileName = fullPath;
+
+                    tab.setText(fullPath);
+                    TreePath selectedPath = e.getPath();
+                    Object selectedNode = selectedPath.getLastPathComponent();
+                    // ...
+                }
+            });
+
+
+        }
         panel.add(fileTree);
     }
 
@@ -795,6 +1010,11 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
     }
 
+    public static ImageIcon generateImageIcon(ImageIcon imageIcon) {
+        Image image = imageIcon.getImage();
+        image = image.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+        return new ImageIcon(image);
+    }
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
@@ -841,6 +1061,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     public void windowDeactivated(WindowEvent windowEvent) {
 
     }
+
 }
 
 

@@ -1,5 +1,8 @@
 package dev.levi.presetation;
 
+import dev.levi.data.FileDao;
+import dev.levi.data.FileDaoImpl;
+import dev.levi.domain.Files;
 import dev.levi.presetation.components.DarkThemeFileChooser;
 
 import javax.swing.*;
@@ -13,6 +16,7 @@ import java.io.IOException;
 
 public class FileCreator extends JPanel
         implements ActionListener {
+    private final FileDao dao = new FileDaoImpl();
     JButton go;
 
     JLabel directoryLabel =new JLabel("Select folder to create");
@@ -25,6 +29,7 @@ public class FileCreator extends JPanel
     String choosertitle;
     JButton saveButton =new JButton("save");
     private Font uifont;
+    JFrame frame = new JFrame("Create File");
 
       {
       File font_file = new File("./Fonts/DroidSans.ttf");
@@ -91,7 +96,9 @@ if(directory!=""&&filename.getText().length()>1){
     }
 
     try {
+        dao.createFile(new Files(0,directory,directory,System.currentTimeMillis()));
         new EditorFrame(directory);
+        frame.dispose();
     } catch (IOException ex) {
         throw new RuntimeException(ex);
     }
@@ -119,7 +126,6 @@ if(directory!=""&&filename.getText().length()>1){
     }
 
     public void chooseDirectory() {
-        JDialog frame = new JDialog((Frame) null,"Create File");
         frame.setUndecorated(true);
         directoryLabel.setForeground(Color.WHITE);
         fileLabel.setForeground(Color.white);

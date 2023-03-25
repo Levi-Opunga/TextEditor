@@ -21,6 +21,9 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
+import java.util.TimerTask;
+import java.util.Timer;
 
 public class Main {
     public static File droid = new File("./Fonts/DroidSans.ttf");
@@ -30,18 +33,13 @@ public class Main {
     private static Font uifont;
 
     public static void main(String[] args) throws IOException {
-        setUpTheme(true);
+       setUpTheme(true);
+        FileDaoImpl dao = new FileDaoImpl();
+        List<Files> last =(List<Files>) dao.findAllFiles();
 
-        EditorFrame frame = new EditorFrame();
-//        FileDaoImpl dao = new FileDaoImpl();
-//        dao.createFile(new Files(0, "yhdhd", "gggggg/ddd/dd", System.currentTimeMillis()));
-//        dao.createFile(new Files(0, "jjjjj", "/ffjj/ddd/dd", System.currentTimeMillis()));
-//        dao.createFile(new Files(0, "qqqaa", "ddddd/ddd/dd", System.currentTimeMillis()));
-//        dao.createFile(new Files(0, "5tddds", "/wwwww/ddd/dd", System.currentTimeMillis()));
-//        dao.createFile(new Files(0, "ffdss", "/4444/ddd/dd", System.currentTimeMillis()));
-//        dao.findAllFiles().forEach(e -> System.out.println(e));
-//        dao.updateFile(new Files(13,"levi","ddddd/ddd/dd",System.currentTimeMillis()));
-//        dao.findAllFiles().forEach(e -> System.out.println(e));
+
+        EditorFrame frame = new EditorFrame(last.get(0).getPath());
+
 
     }
 
@@ -69,7 +67,6 @@ public class Main {
         UIManager.put("Button.border", null);
 //        DarkThemeFileChooser.setColors();
     }
-
 
     public static Font generateFonts(File fontFile, Float size) {
         Font f = null;
