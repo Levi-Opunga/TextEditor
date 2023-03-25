@@ -97,14 +97,14 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     //RSyntaxDocument document = (RSyntaxDocument)textArea.getDocument();
 
 
-    public EditorFrame getInstance(String name,int width,int height) throws IOException {
+    public EditorFrame getInstance(String name, int width, int height) throws IOException {
         if (instance == null) {
-            EditorFrame editorFrame =new EditorFrame(name);
-            editorFrame.setSize(width,height);
+            EditorFrame editorFrame = new EditorFrame(name);
+            editorFrame.setSize(width, height);
             return editorFrame;
 
         } else {
-            instance.setSize(width,height);
+            instance.setSize(width, height);
             return instance;
         }
 
@@ -256,13 +256,13 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     }
 
     private void resizeHelper(int height, int width) {
-        if(!sidebar.isVisible()){
+        if (!sidebar.isVisible()) {
 
             tab.setBounds(0, 0, width, 30);
 
             //sidebar.setBounds(0, 0, (int) (width * .2), height);
             main.setBounds(0, 30, width, height - 30);
-        }else {
+        } else {
 
             // sidebar.setSize((int) (width * .2), height);
             tab.setBounds((int) (width * .2), 0, (int) (width * .8), 30);
@@ -301,7 +301,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
                 dispose();
                 try {
-                    getInstance(fileName,getWidth(),getHeight());
+                    getInstance(fileName, getWidth(), getHeight());
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -317,7 +317,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
                 dispose();
                 try {
-                    getInstance(fileName,getWidth(),getHeight());
+                    getInstance(fileName, getWidth(), getHeight());
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -331,6 +331,96 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         delete.setIcon(deleteIcon);
         web.setIcon(webIcon);
         settings.setIcon(settingsIcon);
+        JMenu editorStyle = new JMenu("Editor Colors");
+        settings.add(editorStyle);
+        JMenuItem darktheme = new JMenuItem("Dark");
+        JMenuItem defaulttheme = new JMenuItem("Default");
+        JMenuItem defaultalt = new JMenuItem("Default 2");
+        JMenuItem druid = new JMenuItem("Druid");
+        JMenuItem eclipse = new JMenuItem("Eclipse");
+        JMenuItem idea = new JMenuItem("Idea");
+        JMenuItem monokai = new JMenuItem("Monokai");
+        JMenuItem vscode = new JMenuItem("Vscode");
+        darktheme.addActionListener(e -> {
+            try {
+                Theme theme = Theme.load(getClass().getResourceAsStream(
+                        "/org/fife/ui/rsyntaxtextarea/themes/dark.xml"));
+                theme.apply(textArea);
+            } catch (IOException ioe) { // Never happens
+                ioe.printStackTrace();
+            }
+
+        });
+        defaulttheme.addActionListener(e -> {
+            try {
+                Theme theme = Theme.load(getClass().getResourceAsStream(
+                        "/org/fife/ui/rsyntaxtextarea/themes/default.xml"));
+                theme.apply(textArea);
+            } catch (IOException ioe) { // Never happens
+                ioe.printStackTrace();
+            }
+
+        });
+        defaultalt.addActionListener(e -> {
+            try {
+                Theme theme = Theme.load(getClass().getResourceAsStream(
+                        "/org/fife/ui/rsyntaxtextarea/themes/default-alt.xml"));
+                theme.apply(textArea);
+            } catch (IOException ioe) { // Never happens
+                ioe.printStackTrace();
+            }
+
+        });
+        druid.addActionListener(e -> {
+            try {
+                Theme theme = Theme.load(getClass().getResourceAsStream(
+                        "/org/fife/ui/rsyntaxtextarea/themes/druid.xml"));
+                theme.apply(textArea);
+            } catch (IOException ioe) { // Never happens
+                ioe.printStackTrace();
+            }
+
+        });
+        idea.addActionListener(e -> {
+            try {
+                Theme theme = Theme.load(getClass().getResourceAsStream(
+                        "/org/fife/ui/rsyntaxtextarea/themes/idea.xml"));
+                theme.apply(textArea);
+            } catch (IOException ioe) { // Never happens
+                ioe.printStackTrace();
+            }
+
+        });
+        monokai.addActionListener(e -> {
+            try {
+                Theme theme = Theme.load(getClass().getResourceAsStream(
+                        "/org/fife/ui/rsyntaxtextarea/themes/monokai.xml"));
+                theme.apply(textArea);
+            } catch (IOException ioe) { // Never happens
+                ioe.printStackTrace();
+            }
+
+        });
+        vscode.addActionListener(e -> {
+            try {
+                Theme theme = Theme.load(getClass().getResourceAsStream(
+                        "/org/fife/ui/rsyntaxtextarea/themes/vs.xml"));
+                theme.apply(textArea);
+            } catch (IOException ioe) { // Never happens
+                ioe.printStackTrace();
+            }
+
+        });
+        eclipse.addActionListener(e -> {
+            try {
+                Theme theme = Theme.load(getClass().getResourceAsStream(
+                        "/org/fife/ui/rsyntaxtextarea/themes/eclipse.xml"));
+                theme.apply(textArea);
+            } catch (IOException ioe) { // Never happens
+                ioe.printStackTrace();
+            }
+
+        });
 
         JMenuItem sidebarMenuItem = new JMenuItem("Toggle Sidebar");
         sidebarMenuItem.addActionListener((e) -> {
@@ -363,6 +453,14 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                 }
             }
         };
+        editorStyle.add(defaulttheme);
+        editorStyle.add(defaultalt);
+        editorStyle.add(darktheme);
+        editorStyle.add(druid);
+        editorStyle.add(eclipse);
+        editorStyle.add(idea);
+        editorStyle.add(monokai);
+        editorStyle.add(vscode);
 
         saveAction.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S);
         saveFile.setAction(saveAction);

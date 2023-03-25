@@ -17,35 +17,33 @@ import java.util.Arrays;
 public class App extends JFrame {
 
     public static App getInstance() throws IOException {
-        if (INSTANCE==null){
-            return  new App();
-        }else {
-           return INSTANCE;
+        if (INSTANCE == null) {
+            return new App();
+        } else {
+            return INSTANCE;
         }
     }
 
-  private static App INSTANCE = null;
- private JMenuBar bar = new JMenuBar();
- private JMenu fileMenu = new JMenu();
- private  JMenu view = new JMenu();
- private  JMenu settings = new JMenu();
- private JMenu edit = new JMenu();
-private  JMenu help =new JMenu();
- private JMenu viewMenu = new JMenu();
-private  JPanel secondPanel = new JPanel();
+    private static App INSTANCE = null;
+    private JMenuBar bar = new JMenuBar();
+    private JMenu fileMenu = new JMenu();
+    private JMenu view = new JMenu();
+    private JMenu settings = new JMenu();
+    private JMenu edit = new JMenu();
+    private JMenu help = new JMenu();
+    private JMenu viewMenu = new JMenu();
+    private JPanel secondPanel = new JPanel();
     private JPanel panel = new JPanel();
-private String fileName = "";
+    private String fileName = "";
 
- private JEditorPane jEditorPane = new JEditorPane();
-
-
+    private JEditorPane jEditorPane = new JEditorPane();
 
 
     private JScrollPane scrollPane;
 
     private App() throws HeadlessException, IOException {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setSize(600,600);
+        setSize(600, 600);
         setLayout(null);
         try {
             configureEditor();
@@ -55,19 +53,19 @@ private String fileName = "";
 
         int height = getSize().height;
         int width = getSize().width;
-        panel.setSize((int)(width*.2),height);
+        panel.setSize((int) (width * .2), height);
         HTMLDocument document = new HTMLDocument();
         //scrollPane.setSize(new Dimension((int) (width*.8),height));
-       scrollPane = new JScrollPane(jEditorPane);
-        scrollPane.setBounds((int)(width*.2),0, (int) (width*.8),height);
-        panel.setBounds(0,0, (int) (width*.2),height);
+        scrollPane = new JScrollPane(jEditorPane);
+        scrollPane.setBounds((int) (width * .2), 0, (int) (width * .8), height);
+        panel.setBounds(0, 0, (int) (width * .2), height);
         resizeEvent();
 
 
         scrollPane.add(jEditorPane);
         panel.setBackground(Color.BLUE);
-getContentPane().add(scrollPane);
-  //     add(panel);
+        getContentPane().add(scrollPane);
+        //     add(panel);
 
 //        getContentPane().setBackground(Color.BLACK);
 //        getContentPane().add(scrollPane);
@@ -80,17 +78,17 @@ getContentPane().add(scrollPane);
         new EditorFrame().initializeView("");
     }
 
-    private void resizeEvent(){
+    private void resizeEvent() {
         addComponentListener(new ComponentListener() {
 
             @Override
             public void componentResized(ComponentEvent e) {
                 int height = e.getComponent().getSize().height;
                 int width = e.getComponent().getSize().width;
-                panel.setSize((int)(width*.2),height);
+                panel.setSize((int) (width * .2), height);
                 scrollPane = new JScrollPane(jEditorPane);
-                scrollPane.setBounds((int)(width*.2),0, (int) (width*.8),height);
-                panel.setBounds(0,0, (int) (width*.2),height);
+                scrollPane.setBounds((int) (width * .2), 0, (int) (width * .8), height);
+                panel.setBounds(0, 0, (int) (width * .2), height);
             }
 
             @Override
@@ -110,13 +108,13 @@ getContentPane().add(scrollPane);
         });
     }
 
-    private void configureMenu(){
+    private void configureMenu() {
         fileMenu.setText("File");
         view.setText("View");
         edit.setText("Edit");
         settings.setText("Settings");
         help.setText("Help");
-        JMenu[] menus = {fileMenu,view,edit,settings,help};
+        JMenu[] menus = {fileMenu, view, edit, settings, help};
         Arrays.stream(menus).forEach(item ->
                 bar.add(item)
         );
@@ -134,21 +132,23 @@ getContentPane().add(scrollPane);
             public void actionPerformed(ActionEvent e) {
 
                 System.out.println("here");
-                   JFileChooser fc = new JFileChooser();
-                int i=fc.showOpenDialog(null);
-                if(i==JFileChooser.APPROVE_OPTION){
-                    File f=fc.getSelectedFile();
-                    String filepath=f.getPath();
-                    try{
-                        BufferedReader br=new BufferedReader(new FileReader(filepath));
-                        String s1="",s2="";
-                        while((s1=br.readLine())!=null){
-                            s2+=s1+"\n";
+                JFileChooser fc = new JFileChooser();
+                int i = fc.showOpenDialog(null);
+                if (i == JFileChooser.APPROVE_OPTION) {
+                    File f = fc.getSelectedFile();
+                    String filepath = f.getPath();
+                    try {
+                        BufferedReader br = new BufferedReader(new FileReader(filepath));
+                        String s1 = "", s2 = "";
+                        while ((s1 = br.readLine()) != null) {
+                            s2 += s1 + "\n";
                         }
                         jEditorPane.setText(s2);
-                        fileName =filepath;
+                        fileName = filepath;
                         br.close();
-                    }catch (Exception ex) {ex.printStackTrace();  }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
         });
@@ -158,10 +158,12 @@ getContentPane().add(scrollPane);
 
 
     }
+
     private void configureEditor() throws IOException {
 
     }
-    private void configureSidePanel(){
+
+    private void configureSidePanel() {
 
     }
 
