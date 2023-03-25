@@ -2,6 +2,8 @@ package dev.levi.presetation;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import dev.levi.data.FileDaoImpl;
+import dev.levi.domain.Files;
 import dev.levi.presetation.components.DarkThemeFileChooser;
 import dev.levi.presetation.components.FileTree;
 import dev.levi.presetation.components.SwingHTMLBrowser;
@@ -37,7 +39,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -66,6 +70,10 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     public static ImageIcon previewIcon = generateImageIcon(new ImageIcon("./Images/preview.png"));
     public static ImageIcon webIcon = generateImageIcon(new ImageIcon("./Images/browser.gif"));
     private static int windowCount = 0;
+    private  FileDaoImpl dao =  dao = new FileDaoImpl();
+    List<Files> recentlyOpenedFiles = (List<Files>) dao.findAllFiles();
+
+
 
     public EditorFrame(Action action) {
 
@@ -179,6 +187,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         tab.setBounds((int) (width * .2), 0, (int) (width * .8), 30);
         tab.setFont(Main.generateFonts(Main.jetbrains, 12f));
         tab.setText(fileName);
+        tab.setIcon(fileIcon);
         sidebar.setBounds(0, 0, (int) (width * .2), height);
         main.setBounds((int) (width * .2), 30, (int) (width * .8), height - 30);
         getContentPane().add(main);
@@ -434,7 +443,9 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         JMenuItem openExistingFile = new JMenuItem("Open file");
         openExistingFile.setIcon(closedFolderIcon);
 
-        JMenuItem openRecentFile = new JMenuItem("Recent Files");
+        JMenu openRecentFile = new JMenu("Recent Files");
+        List<JMenuItem> items = recentlyOpenedFiles.stream().map(e->new JMenuItem(e.getPath())).toList();
+        items.forEach(openRecentFile::add);
 
 
         JMenuItem saveFile = new JMenuItem("Save");

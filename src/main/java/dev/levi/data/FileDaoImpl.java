@@ -50,8 +50,9 @@ public class FileDaoImpl implements FileDao{
     public Iterable<Files> findAllFiles() {
         List<Files> list = new ArrayList<Files>();
         try {
+
             Statement statement = conn.createStatement();
-            String sql = "SELECT * FROM FILES;";
+            String sql = "SELECT * FROM FILES order by time DESC LIMIT 8;";
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
@@ -67,6 +68,24 @@ public class FileDaoImpl implements FileDao{
             throw new RuntimeException(e);
         }
         return list;
+    }
+
+    @Override
+    public void updateFile(Files file) {
+        try {
+            PreparedStatement statement = conn.prepareStatement(
+                    "UPDATE FILES SET name=? ,time =? " +
+                    " WHERE path = ?");
+//            statement.setInt(1, 0);
+            statement.setString(1, file.getName());
+            statement.setLong(2,file.getTime());
+            statement.setString(3, file.getPath());
+            statement.executeUpdate();
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
 

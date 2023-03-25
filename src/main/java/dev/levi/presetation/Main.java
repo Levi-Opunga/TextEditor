@@ -3,6 +3,8 @@ package dev.levi.presetation;
 import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+import dev.levi.data.FileDaoImpl;
+import dev.levi.domain.Files;
 import dev.levi.presetation.components.DarkThemeFileChooser;
 import org.apache.commons.io.IOUtils;
 import org.netbeans.api.java.lexer.JavaTokenId;
@@ -21,26 +23,36 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class Main {
-   public static File droid = new File("./Fonts/DroidSans.ttf");
-  public  static File jetbrains = new File("./Fonts/JetBrains Mono Bold Nerd Font Complete.ttf");
-   public static File fira = new File("./Fonts/Fira Code Regular Nerd Font Complete Mono.ttf");
-  public static   File hack = new File("./Fonts/Hack Bold Nerd Font Complete.ttf");
+    public static File droid = new File("./Fonts/DroidSans.ttf");
+    public static File jetbrains = new File("./Fonts/JetBrains Mono Bold Nerd Font Complete.ttf");
+    public static File fira = new File("./Fonts/Fira Code Regular Nerd Font Complete Mono.ttf");
+    public static File hack = new File("./Fonts/Hack Bold Nerd Font Complete.ttf");
     private static Font uifont;
 
     public static void main(String[] args) throws IOException {
         setUpTheme(true);
         EditorFrame frame = new EditorFrame();
+//        FileDaoImpl dao = new FileDaoImpl();
+//        dao.createFile(new Files(0, "yhdhd", "gggggg/ddd/dd", System.currentTimeMillis()));
+//        dao.createFile(new Files(0, "jjjjj", "/ffjj/ddd/dd", System.currentTimeMillis()));
+//        dao.createFile(new Files(0, "qqqaa", "ddddd/ddd/dd", System.currentTimeMillis()));
+//        dao.createFile(new Files(0, "5tddds", "/wwwww/ddd/dd", System.currentTimeMillis()));
+//        dao.createFile(new Files(0, "ffdss", "/4444/ddd/dd", System.currentTimeMillis()));
+//        dao.findAllFiles().forEach(e -> System.out.println(e));
+//        dao.updateFile(new Files(13,"levi","ddddd/ddd/dd",System.currentTimeMillis()));
+//        dao.findAllFiles().forEach(e -> System.out.println(e));
 
     }
 
 
     public static void setUpTheme(boolean darkTheme) {
-        if (darkTheme){
-        try {
-            UIManager.setLookAndFeel(new FlatDarculaLaf());
-        } catch (UnsupportedLookAndFeelException e) {
-            throw new RuntimeException(e);
-        }}else {
+        if (darkTheme) {
+            try {
+                UIManager.setLookAndFeel(new FlatDarculaLaf());
+            } catch (UnsupportedLookAndFeelException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
             try {
                 UIManager.setLookAndFeel(new FlatIntelliJLaf());
             } catch (UnsupportedLookAndFeelException e) {
@@ -48,26 +60,26 @@ public class Main {
             }
         }
 
-        uifont = generateFonts(fira,15f);
-        UIManager.put("ScrollPane.horizontalScrollBarPolicy",ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        UIManager.put("REditorPane.font",generateFonts(jetbrains,17f));
-        UIManager.put("MenuItem.font", generateFonts(fira,12f));
-        UIManager.put("Menu.font",generateFonts(droid,13f));
-            UIManager.put("Button.border", null);
+        uifont = generateFonts(fira, 15f);
+        UIManager.put("ScrollPane.horizontalScrollBarPolicy", ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        UIManager.put("REditorPane.font", generateFonts(jetbrains, 17f));
+        UIManager.put("MenuItem.font", generateFonts(fira, 12f));
+        UIManager.put("Menu.font", generateFonts(droid, 13f));
+        UIManager.put("Button.border", null);
 //        DarkThemeFileChooser.setColors();
     }
 
 
-    public static Font generateFonts(File fontFile,Float size) {
+    public static Font generateFonts(File fontFile, Float size) {
         Font f = null;
         try {
-            f = Font.createFont(Font.TRUETYPE_FONT,fontFile);
+            f = Font.createFont(Font.TRUETYPE_FONT, fontFile);
         } catch (FontFormatException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        f= f.deriveFont(size);
+        f = f.deriveFont(size);
         return f;
 
     }
