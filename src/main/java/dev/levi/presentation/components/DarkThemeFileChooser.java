@@ -35,7 +35,7 @@ public class DarkThemeFileChooser {
 
             return chooser.getSelectedFile().getAbsolutePath();
         } else if (result==JFileChooser.CANCEL_OPTION) {
-            return "";
+            return EditorFrame.folderName;
         } else {
             return DarkThemeFileChooser.chooseAnyFile(files);
         }

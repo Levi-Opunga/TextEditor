@@ -5,22 +5,16 @@ import com.formdev.flatlaf.FlatIntelliJLaf;
 import dev.levi.data.FileDaoImpl;
 import dev.levi.domain.Files;
 import dev.levi.presentation.EditorFrame;
-import dev.levi.utils.FileCopier;
-import org.apache.commons.io.FileUtils;
+import dev.levi.utils.FileEdit;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.*;
 import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 public class Main {
     public static File droid = new File("./Fonts/DroidSans.ttf");
@@ -36,7 +30,7 @@ public class Main {
 
     static {
         try {
-            list = FileCopier.copyFromJar("images");
+            list = FileEdit.copyFromJar("images");
             for (int i=1; i<list.size(); i++) {
             String icon = list.get(i);
             if(icon==null){
@@ -49,8 +43,8 @@ public class Main {
 
                             if (icon.endsWith("png")){
                                 System.out.println( icon);
-                              //  Image image = ImageIO.read(Main.class.getClassLoader().getResourceAsStream(icon));
-                                Image image = ImageIO.read(new File(icon));
+                                Image image = ImageIO.read(Main.class.getClassLoader().getResourceAsStream(icon));
+                              //  Image image = ImageIO.read(new File(icon));
 
                             icon = icon.replace("images/","");
                            icon = icon.replace(".png","");
@@ -84,9 +78,6 @@ public class Main {
             dao.createFile(new Files(0, "./", "./", System.currentTimeMillis()));
         }
         setUpTheme(true);
-
-
-
         last = (List<Files>) dao.findAllFiles();
 
         try {
@@ -94,7 +85,6 @@ public class Main {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
 
     }
 

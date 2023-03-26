@@ -7,14 +7,13 @@ import java.awt.datatransfer.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-public class FileCopier {
+public class FileEdit {
     static final File jarFile = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 
     public static void copyFileToClipboard(File file) {
@@ -101,4 +100,21 @@ public class FileCopier {
         return list;
     }
 
+
+
+    public static void deleteFolder(File folder) {
+        // Check if the given File object represents a file or directory
+        if (folder.isDirectory()) {
+            // If it's a directory, get all the files and directories inside it
+            File[] files = folder.listFiles();
+
+            // Recursively delete all the files and directories inside the folder
+            for (File file : files) {
+                deleteFolder(file);
+            }
+        }
+
+        // Delete the file or empty directory
+        folder.delete();
+    }
 }

@@ -6,7 +6,7 @@ import dev.levi.domain.Files;
 import dev.levi.presentation.components.DarkThemeFileChooser;
 import dev.levi.presentation.components.FileTree;
 import dev.levi.presentation.components.SwingHTMLBrowser;
-import dev.levi.utils.FileCopier;
+import dev.levi.utils.FileEdit;
 import dev.levi.utils.FileExtensionUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -34,7 +34,6 @@ import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.*;
@@ -63,8 +62,8 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     private JLabel tab = new JLabel();
     public static int openWindowCount = 0;
 
-    public static String fileName = "000000";
-    public static String folderName = "";
+    public static String fileName = "./";
+    public static String folderName = "./";
     //  TextEditorPane textArea = new TextEditorPane();
     public static ImageIcon openFolderIcon = Main.images.get("open");
     //generateImageIcon(new ImageIcon("/images/open.png"));
@@ -99,7 +98,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
             public void run() {
                 try {
                     File file = new File(fileName);
-                    if (file.exists()) {
+                    if (file.exists()&&!file.isDirectory()) {
                         FileWriter fr = new FileWriter(file);
                         fr.write(textArea.getText());
                         fr.close();
@@ -387,13 +386,13 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                 new File(fileName).delete();
                 fileName = folderName;
 
-                dispose();
                 try {
                     EditorFrame editorFrame = new EditorFrame(fileName, folderName);
                     editorFrame.setSize(getWidth(), getHeight());
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
+                dispose();
 
             }
         });
@@ -661,7 +660,9 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
 
                 File f = new File(DarkThemeFileChooser.chooseAnyFile(false));
-
+                if (f.getPath()==fileName){
+                    return;
+                }
                 fileName = f.getPath();
                 folderName = f.getPath();
 
@@ -794,21 +795,26 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                         }
                         String finalFull = full;
                         copy.addActionListener(
-                                event -> FileCopier.copyFileToClipboard(new File(finalFull))
+                                event -> FileEdit.copyFileToClipboard(new File(finalFull))
                         );
                         delete.addActionListener(event -> {
                             File file = new File(finalFull);
                             file.delete();
-                            dispose();
+                            if(file.isDirectory()){
+                                FileEdit.deleteFolder(file);
+                            }
+
                             try {
                                 if (finalFull == fileName) {
                                     fileName = folderName;
                                 }
-                                EditorFrame editorFrame = new EditorFrame(fileName, folderName);
+                                dao.createFile(new Files(folderName,folderName));
+                                EditorFrame editorFrame = new EditorFrame(folderName, folderName);
                                 editorFrame.setSize(getWidth(), getHeight());
                             } catch (IOException ex) {
                                 throw new RuntimeException(ex);
                             }
+                            dispose();
 
                         });
                         popupMenu.show(e.getComponent(), e.getX(), e.getY());
@@ -886,23 +892,26 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                         }
                         String finalFull = full;
                         copy.addActionListener(
-                                event -> FileCopier.copyFileToClipboard(new File(finalFull))
+                                event -> FileEdit.copyFileToClipboard(new File(finalFull))
                         );
                         delete.addActionListener(event -> {
                             File file = new File(finalFull);
                             file.delete();
+                            if(file.isDirectory()){
+                                FileEdit.deleteFolder(file);
+                            }
                             if (fileName == finalFull) {
                                 fileName = folderName;
                             }
-                            dispose();
+
                             try {
                                 dao.createFile(new Files(folderName,folderName));
-                                EditorFrame editorFrame = new EditorFrame(fileName, folderName);
+                                EditorFrame editorFrame = new EditorFrame(folderName, folderName);
                                 editorFrame.setSize(getWidth(), getHeight());
                             } catch (IOException ex) {
                                 throw new RuntimeException(ex);
                             }
-
+                            dispose();
                         });
                         popupMenu.show(e.getComponent(), e.getX(), e.getY());
                     }

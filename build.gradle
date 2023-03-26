@@ -53,7 +53,7 @@ mainClassName = "dev.levi.Main"
 
 jar {
 
-    from('src/main/java') {
+    from('src/..') {
         include 'Fonts/**.ttf'
     }
     from('src/..') {
@@ -69,6 +69,7 @@ jar {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
+
 //jar {
 //    manifest {
 //        attributes(
