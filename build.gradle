@@ -1,8 +1,11 @@
 plugins {
     id 'java'
-
+    id 'application'
 }
 
+application {
+    mainClass = 'dev.levi.Main'
+}
 group 'org.example'
 version '1.0-SNAPSHOT'
 
@@ -10,11 +13,13 @@ repositories {
     mavenCentral()
 }
 
+
+
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 
-    implementation files("${System.properties['java.home']}/../lib/tools.jar")
+   // implementation files("${System.properties['java.home']}/../lib/tools.jar")
 //    implementation 'org.netbeans.modules:org-netbeans-modules-java-editor:RELEASE170'
 //    implementation 'org.netbeans.api:org-netbeans-modules-editor-mimelookup:RELEASE140'
 //    implementation 'org.netbeans.api:org-netbeans-modules-java-editor:RELEASE123'
@@ -36,6 +41,76 @@ dependencies {
 
 }
 
+
+project.configurations.implementation.setCanBeResolved(true)
+
 test {
     useJUnitPlatform()
 }
+
+
+mainClassName = "dev.levi.Main"
+
+jar {
+
+    from('src/main/java') {
+        include 'Fonts/**.ttf'
+    }
+    from('src/..') {
+        include 'images/**.png'
+    }
+
+    manifest {
+        attributes "Main-Class": "$mainClassName"
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+//jar {
+//    manifest {
+//        attributes(
+//                "Name": "Text Eidtor",
+//                "Class-Path":  configurations.runtimeClasspath.files.collect { it.getName() }.join(' '),
+//                "Main-Class": "dev.levi.Main",
+//                "Implementation-Title": "Gradle",
+//                "Implementation-Version": archiveVersion)
+//    }
+//}
+//
+//def dependsDir = "${buildDir}/libs/dependencies/"
+//task copyDependencies(type: Copy) {
+//    from configurations.runtimeClasspath
+//    into "${dependsDir}"
+//}
+//
+//task createJar(dependsOn: copyDependencies, type: Jar) {
+//
+//    manifest {
+//        attributes('Main-Class': 'com.example.gradle.App',
+//                'Class-Path': configurations.runtimeClasspath.files.collect { 'dependencies/' + it.getName() }.join(' ')
+//        )
+//    }
+//    with jar
+//}
+
+//jar{
+//    manifest {
+//        attributes(
+//                "Main-Class": "dev.levi.Main",
+//                "Class-Path":  configurations.implementation.collect { it.name }.join(' ')
+//        )
+//    }
+//    dependsOn ('dependencies')
+//}
+
+//jar {
+//    manifest {
+//        attributes(
+//                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+//                'Main-Class': 'dev.levi.Main'
+//        )
+//    }
+//}

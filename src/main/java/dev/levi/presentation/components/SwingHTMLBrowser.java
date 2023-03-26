@@ -1,11 +1,10 @@
 package dev.levi.presentation.components;
 
-import dev.levi.presentation.Main;
+import dev.levi.Main;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.io.IOException;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.html.*;
@@ -54,7 +53,7 @@ public class SwingHTMLBrowser extends JFrame implements ActionListener, Hyperlin
             t.printStackTrace();
         }
     }
-avec moi
+
     public void hyperlinkUpdate(HyperlinkEvent evt) {
         if (evt.getEventType() != HyperlinkEvent.EventType.ACTIVATED) {
             return;

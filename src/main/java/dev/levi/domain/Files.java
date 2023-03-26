@@ -46,6 +46,14 @@ public class Files {
         this.time = time;
     }
 
+    public Files(String name, String path) {
+        this.id=0;
+        this.name = name;
+        this.path = path;
+        this.time = System.currentTimeMillis();
+
+    }
+
     public Files(int id, String name, String path) {
         this.id = id;
         this.name = name;

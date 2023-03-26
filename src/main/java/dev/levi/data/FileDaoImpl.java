@@ -11,7 +11,9 @@ public class FileDaoImpl implements FileDao{
 
     static {
         try {
-            conn=   DriverManager.getConnection ("jdbc:h2:./src/main/resources/db", "sa","");
+            conn=   DriverManager.getConnection ("jdbc:h2:./datatbase/db", "sa","");
+
+            //conn=   DriverManager.getConnection ("jdbc:h2:./src/main/resources/db", "sa","");
             Statement stmt = null;
             stmt = conn.createStatement();
             String sql =  "SET MODE PostgreSQL; " +
