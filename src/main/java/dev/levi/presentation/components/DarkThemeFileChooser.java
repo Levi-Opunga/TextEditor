@@ -5,11 +5,15 @@ import dev.levi.presentation.EditorFrame;
 import javax.swing.*;
 import java.io.File;
 
+import static dev.levi.Main.setUpTheme;
+
 
 public class DarkThemeFileChooser {
     public static String chooseAnyFile(Boolean files,String foldername) {
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            setUpTheme(true);
+           // UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
         } catch (Exception e) {
             e.printStackTrace();
         }

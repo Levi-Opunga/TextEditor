@@ -51,9 +51,11 @@ public class FileCreator extends JPanel
         this.width = width;
         this.height = height;
         if (new File(startFolder).isDirectory()) {
-            directory = new File(startFolder).getParent();
-        } else {
             directory = startFolder;
+        } else {
+            directory = new File(startFolder).getParent();
+
+
         }
     }
 

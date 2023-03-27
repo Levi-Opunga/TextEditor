@@ -44,8 +44,8 @@ public class Main {
 
                             if (icon.endsWith("png")){
                                 System.out.println( icon);
-                                //   Image image = ImageIO.read(Main.class.getClassLoader().getResourceAsStream(icon));
-                                Image image = ImageIO.read(new File(icon));
+                                   Image image = ImageIO.read(Main.class.getClassLoader().getResourceAsStream(icon));
+                                //Image image = ImageIO.read(new File(icon));
 
                                 if (System.getProperty("os.name").toLowerCase().contains("linux")) {
                                     icon = icon.replace("images/", "");
@@ -93,6 +93,7 @@ public class Main {
             String name = last.get(0).getName();
             String path = last.get(0).getPath();
             if(new File(name).exists()&&new File(path).isDirectory()){
+                setUpTheme(true);
                 EditorFrame frame = new EditorFrame(name, path);
 
             }else {

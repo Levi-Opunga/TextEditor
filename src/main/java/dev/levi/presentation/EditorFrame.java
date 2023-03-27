@@ -673,7 +673,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                 // DarkThemeFileChooser fc = new DarkThemeFileChooser();
 
 
-                String pathname = DarkThemeFileChooser.chooseAnyFile(true, folderName);
+                String pathname = DarkThemeFileChooser.chooseAnyFile(false, folderName);
                 if (pathname == null){
                     return;
                 }
