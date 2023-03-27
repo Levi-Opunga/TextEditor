@@ -384,6 +384,9 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 File file = new File(fileName);
+                if (!file.exists()) {
+                    return;
+                }
                 int sure = JOptionPane.showConfirmDialog(Frame.getFrames()[Frame.getFrames().length - 1], "Are sure you want to delete " + file.getName());
                 if (sure == JOptionPane.YES_OPTION) {
                     file.delete();
@@ -805,17 +808,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                                 event -> FileEdit.copyFileToClipboard(new File(finalFull))
                         );
                         delete.addActionListener(event -> {
-                            File file = new File(finalFull);
-                            int sure = JOptionPane.showConfirmDialog(Frame.getFrames()[Frame.getFrames().length - 1], "Are sure you want to delete " + file.getName());
-                            if (sure == JOptionPane.YES_OPTION) {
-                                if (file.isDirectory()) {
-                                    FileEdit.deleteFolder(file);
-                                } else {
-                                    file.delete();
-                                }
-                            } else {
-                                return;
-                            }
+                            if (safeDelete(finalFull)) return;
 
 
                             try {
@@ -912,16 +905,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                                 event -> FileEdit.copyFileToClipboard(new File(finalFull))
                         );
                         delete.addActionListener(event -> {
-                            int sure = JOptionPane.showConfirmDialog(Frame.getFrames()[Frame.getFrames().length - 1], "Are sure you want to delete " + file.getName());
-                            if (sure == JOptionPane.YES_OPTION) {
-                                if (file.isDirectory()) {
-                                    FileEdit.deleteFolder(file);
-                                } else {
-                                    file.delete();
-                                }
-                            } else {
-                                return;
-                            }
+                            if (safeDelete(finalFull)) return;
                             if (fileName == finalFull) {
                                 fileName = folderName;
                             }
@@ -978,6 +962,24 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
         }
         panel.add(fileTree);
+    }
+
+    private boolean safeDelete(String finalFull) {
+        File deletefile = new File(finalFull);
+        if (!deletefile.exists()) {
+            return true;
+        }
+        int sure = JOptionPane.showConfirmDialog(Frame.getFrames()[Frame.getFrames().length - 1], "Are sure you want to delete " + deletefile.getName());
+        if (sure == JOptionPane.YES_OPTION) {
+            if (deletefile.isDirectory()) {
+                FileEdit.deleteFolder(deletefile);
+            } else {
+                deletefile.delete();
+            }
+        } else {
+            return true;
+        }
+        return false;
     }
 
     public void getSyntaxCompletions(String extension) {
