@@ -32,25 +32,32 @@ public class Main {
         try {
             list = FileEdit.copyFromJar("images");
             for (int i=1; i<list.size(); i++) {
-            String icon = list.get(i);
-            if(icon==null){
+                String icon = list.get(i);
+                if(icon==null){
 
-            }else {
+                }else {
                     {
 
                         try {
-                          //
+                            //
 
                             if (icon.endsWith("png")){
                                 System.out.println( icon);
-                                Image image = ImageIO.read(Main.class.getClassLoader().getResourceAsStream(icon));
-                              //  Image image = ImageIO.read(new File(icon));
+                                //   Image image = ImageIO.read(Main.class.getClassLoader().getResourceAsStream(icon));
+                                Image image = ImageIO.read(new File(icon));
 
-                            icon = icon.replace("images/","");
-                           icon = icon.replace(".png","");
-                           icon = icon.replace("./","");
-                            System.out.println(icon);
-                            images.put(icon,generateImageIcon(image));
+                                if (System.getProperty("os.name").toLowerCase().contains("linux")) {
+                                    icon = icon.replace("images/", "");
+                                    icon = icon.replace(".png", "");
+                                    icon = icon.replace("./", "");
+                                } else if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+                                    icon = icon.replace("images\\", "");
+                                    icon = icon.replace(".png", "");
+                                    icon = icon.replace(".", "");
+                                    icon = icon.replace("/", "");
+                                }
+                                System.out.println(icon);
+                                images.put(icon,generateImageIcon(image));
                                 System.out.println(images);
                             }
                         } catch (IOException e) {

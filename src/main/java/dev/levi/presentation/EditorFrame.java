@@ -98,7 +98,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
             public void run() {
                 try {
                     File file = new File(fileName);
-                    if (file.exists()&&!file.isDirectory()) {
+                    if (file.exists() && !file.isDirectory()) {
                         FileWriter fr = new FileWriter(file);
                         fr.write(textArea.getText());
                         fr.close();
@@ -383,7 +383,14 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                new File(fileName).delete();
+                File file = new File(fileName);
+                int sure = JOptionPane.showConfirmDialog(Frame.getFrames()[Frame.getFrames().length - 1], "Are sure you want to delete " + file.getName());
+                if (sure == JOptionPane.YES_OPTION) {
+                    file.delete();
+                }
+
+                //new File(fileName);
+
                 fileName = folderName;
 
                 try {
@@ -602,7 +609,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
         newFile.addActionListener(e -> {
                     //  int previousframeCount = windowCount;
-                    new FileCreator().chooseDirectory();
+                    FileCreator.chooseDirectory(folderName,getWidth(),getHeight());
                     previousWindow = getTitle();
 
                 }
@@ -629,7 +636,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                 // DarkThemeFileChooser fc = new DarkThemeFileChooser();
 
 
-                File f = new File(DarkThemeFileChooser.chooseAnyFile(true));
+                File f = new File(DarkThemeFileChooser.chooseAnyFile(true, folderName));
 
                 fileName = f.getPath();
                 folderName = f.getParent();
@@ -659,8 +666,8 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                 // DarkThemeFileChooser fc = new DarkThemeFileChooser();
 
 
-                File f = new File(DarkThemeFileChooser.chooseAnyFile(false));
-                if (f.getPath()==fileName){
+                File f = new File(DarkThemeFileChooser.chooseAnyFile(false, folderName));
+                if (f.getPath() == fileName) {
                     return;
                 }
                 fileName = f.getPath();
@@ -799,16 +806,21 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                         );
                         delete.addActionListener(event -> {
                             File file = new File(finalFull);
-                            file.delete();
-                            if(file.isDirectory()){
-                                FileEdit.deleteFolder(file);
+                            int sure = JOptionPane.showConfirmDialog(Frame.getFrames()[Frame.getFrames().length - 1], "Are sure you want to delete " + file.getName());
+                            if (sure == JOptionPane.YES_OPTION) {
+                                if (file.isDirectory()) {
+                                    FileEdit.deleteFolder(file);
+                                } else {
+                                    file.delete();
+                                }
                             }
+
 
                             try {
                                 if (finalFull == fileName) {
                                     fileName = folderName;
                                 }
-                                dao.createFile(new Files(folderName,folderName));
+                                dao.createFile(new Files(folderName, folderName));
                                 EditorFrame editorFrame = new EditorFrame(folderName, folderName);
                                 editorFrame.setSize(getWidth(), getHeight());
                             } catch (IOException ex) {
@@ -862,7 +874,10 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                         JPopupMenu popupMenu = new JPopupMenu();
                         JMenuItem copy = new JMenuItem("Copy Path");
                         copy.setIcon(copyIcon);
-
+                        JMenuItem newFile = new JMenuItem("New file");
+                        newFile.setIcon(fileIcon);
+                        newFile.addActionListener(actionEvent -> FileCreator.chooseDirectory(fileName,getWidth(),getHeight()));
+                        popupMenu.add(newFile);
                         popupMenu.add(copy);
                         JMenuItem delete = new JMenuItem("Delete File");
                         //  JMenuItem web = new JMenuItem("Browser");
@@ -897,7 +912,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                         delete.addActionListener(event -> {
                             File file = new File(finalFull);
                             file.delete();
-                            if(file.isDirectory()){
+                            if (file.isDirectory()) {
                                 FileEdit.deleteFolder(file);
                             }
                             if (fileName == finalFull) {
@@ -905,7 +920,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                             }
 
                             try {
-                                dao.createFile(new Files(folderName,folderName));
+                                dao.createFile(new Files(folderName, folderName));
                                 EditorFrame editorFrame = new EditorFrame(folderName, folderName);
                                 editorFrame.setSize(getWidth(), getHeight());
                             } catch (IOException ex) {
