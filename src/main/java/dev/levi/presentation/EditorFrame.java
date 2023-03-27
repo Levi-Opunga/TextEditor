@@ -609,7 +609,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
         newFile.addActionListener(e -> {
                     //  int previousframeCount = windowCount;
-                    FileCreator.chooseDirectory(folderName,getWidth(),getHeight());
+                    FileCreator.chooseDirectory(folderName, getWidth(), getHeight());
                     previousWindow = getTitle();
 
                 }
@@ -813,6 +813,8 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                                 } else {
                                     file.delete();
                                 }
+                            } else {
+                                return;
                             }
 
 
@@ -876,7 +878,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                         copy.setIcon(copyIcon);
                         JMenuItem newFile = new JMenuItem("New file");
                         newFile.setIcon(fileIcon);
-                        newFile.addActionListener(actionEvent -> FileCreator.chooseDirectory(fileName,getWidth(),getHeight()));
+                        newFile.addActionListener(actionEvent -> FileCreator.chooseDirectory(fileName, getWidth(), getHeight()));
                         popupMenu.add(newFile);
                         popupMenu.add(copy);
                         JMenuItem delete = new JMenuItem("Delete File");
@@ -910,10 +912,15 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                                 event -> FileEdit.copyFileToClipboard(new File(finalFull))
                         );
                         delete.addActionListener(event -> {
-                            File file = new File(finalFull);
-                            file.delete();
-                            if (file.isDirectory()) {
-                                FileEdit.deleteFolder(file);
+                            int sure = JOptionPane.showConfirmDialog(Frame.getFrames()[Frame.getFrames().length - 1], "Are sure you want to delete " + file.getName());
+                            if (sure == JOptionPane.YES_OPTION) {
+                                if (file.isDirectory()) {
+                                    FileEdit.deleteFolder(file);
+                                } else {
+                                    file.delete();
+                                }
+                            } else {
+                                return;
                             }
                             if (fileName == finalFull) {
                                 fileName = folderName;

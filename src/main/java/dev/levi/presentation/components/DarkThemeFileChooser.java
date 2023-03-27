@@ -7,7 +7,7 @@ import java.io.File;
 
 
 public class DarkThemeFileChooser {
-    public static String chooseAnyFile(Boolean files) {
+    public static String chooseAnyFile(Boolean files,String foldername) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
@@ -21,7 +21,7 @@ public class DarkThemeFileChooser {
         } else {
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         }
-        chooser.setCurrentDirectory(new File(EditorFrame.folderName));
+        chooser.setCurrentDirectory(new File(foldername));
         chooser.setMultiSelectionEnabled(false);
         chooser.setApproveButtonText("Select");
         chooser.setDialogTitle("Choose File");
@@ -37,7 +37,7 @@ public class DarkThemeFileChooser {
         } else if (result==JFileChooser.CANCEL_OPTION) {
             return EditorFrame.folderName;
         } else {
-            return DarkThemeFileChooser.chooseAnyFile(files);
+            return DarkThemeFileChooser.chooseAnyFile(files,foldername);
         }
     }
 

@@ -24,8 +24,8 @@ dependencies {
 //    implementation 'org.netbeans.api:org-netbeans-modules-editor-mimelookup:RELEASE140'
 //    implementation 'org.netbeans.api:org-netbeans-modules-java-editor:RELEASE123'
 
-    implementation 'org.netbeans.modules:org-netbeans-modules-java-editor:RELEASE123'
-    implementation 'org.netbeans.modules:org-netbeans-modules-editor-mimelookup-impl:RELEASE123'
+  //  implementation 'org.netbeans.modules:org-netbeans-modules-java-editor:RELEASE123'
+ //   implementation 'org.netbeans.modules:org-netbeans-modules-editor-mimelookup-impl:RELEASE123'
     implementation 'com.fifesoft:rsyntaxtextarea:3.3.3'
     implementation 'com.formdev:flatlaf:3.0'
     implementation 'com.fifesoft:autocomplete:3.3.1'

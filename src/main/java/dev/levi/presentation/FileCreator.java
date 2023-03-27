@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 
 public class FileCreator extends JPanel
@@ -21,8 +20,10 @@ public class FileCreator extends JPanel
     private final FileDao dao = new FileDaoImpl();
     JButton go;
 
-    JLabel directoryLabel = new JLabel("Select folder to create");
-    JLabel fileLabel = new JLabel("File Name");
+    static JLabel directoryLabel = new JLabel("Select folder to create");
+    static JLabel fileLabel = new JLabel("File Name");
+    private int width;
+    private int height;
 
     TextField filename = new TextField(20);
     String directory = EditorFrame.folderName;
@@ -44,6 +45,16 @@ public class FileCreator extends JPanel
             throw new RuntimeException(e);
         }
     }
+private FileCreator(String startFolder, int width, int height){
+        this();
+        this.width = width;
+        this.height = height;
+        if(new File(startFolder).isDirectory()){
+            directory = new File(startFolder).getParent();
+        }else {
+            directory =startFolder;
+        }
+}
 
 
     public FileCreator() {
@@ -58,7 +69,7 @@ public class FileCreator extends JPanel
         // saveButton.setBackground(Color.white);
 
 
-        go.addActionListener(this);
+        go.addActionListener(e-> directory = DarkThemeFileChooser.chooseAnyFile(false,directory));
         directoryLabel.setBounds(20, 20, 300, 40);
         go.setBounds(330, 20, 50, 40);
         fileLabel.setBounds(60, 80, 100, 40);
@@ -117,6 +128,7 @@ public class FileCreator extends JPanel
                             dao.createFile(new Files(0, directory, directory, System.currentTimeMillis()));
                             try {
                                 EditorFrame editorFrame = new EditorFrame(name, EditorFrame.folderName);
+                                editorFrame.setSize(width,height);
                                 Arrays.stream(EditorFrame.getFrames()).filter(frame1 -> frame1.getTitle().equals(EditorFrame.previousWindow)).toList().get(0).dispose();
 frame.dispose();
                             } catch (IOException ex) {
@@ -145,7 +157,6 @@ frame.dispose();
 
     public void actionPerformed(ActionEvent e) {
 
-        directory = DarkThemeFileChooser.chooseAnyFile(false);
 
     }
 
@@ -153,13 +164,13 @@ frame.dispose();
         return new Dimension(400, 200);
     }
 
-    public void chooseDirectory() {
+    public static void chooseDirectory(String folderName, int width, int height) {
         frame = new JFrame("Create File");
         frame.setUndecorated(true);
         directoryLabel.setForeground(Color.WHITE);
         fileLabel.setForeground(Color.white);
         // frame.setOpacity(.9F);
-        FileCreator panel = new FileCreator();
+        FileCreator panel = new FileCreator(folderName,width,height);
         Shape shape = new RoundRectangle2D.Double(0, 0, panel.getPreferredSize().width, panel.getPreferredSize().getHeight(), 20, 20);
         frame.setShape(shape);
         frame.setSize(panel.getPreferredSize());
