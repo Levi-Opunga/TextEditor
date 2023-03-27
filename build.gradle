@@ -13,7 +13,7 @@ repositories {
     mavenCentral()
 }
 
-//hello
+//ddw EWE yyy ffffn 
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
@@ -69,6 +69,8 @@ jar {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
+
+
 
 //jar {
 //    manifest {

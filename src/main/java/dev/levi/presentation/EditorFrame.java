@@ -43,13 +43,17 @@ import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.TimerTask;
 
 
 import static dev.levi.Main.generateFonts;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public class EditorFrame extends JFrame implements ActionListener, WindowListener {
 
@@ -64,7 +68,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     private JLabel tab = new JLabel();
     public static int openWindowCount = 0;
 
-    private Timer saveTimer ;
+    private Timer saveTimer;
 
 
     private String fileName = "./";
@@ -85,12 +89,15 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     public static ImageIcon webIcon = Main.images.get("browser");
     private static int windowCount = 0;
     private FileDaoImpl dao = dao = new FileDaoImpl();
-   private List<Files> recentlyOpenedFiles = (List<Files>) dao.findAllFiles();
+    private List<Files> recentlyOpenedFiles = (List<Files>) dao.findAllFiles();
 
     public static List<String> editorWindows = new ArrayList<>();
     private boolean textChanged;
-
-
+    private Path filePath;
+    private String previousContent = null;
+    private WatchService watchService;
+    private WatchKey watchKey;
+    private Timer watchTimer;
 
 
 //    {
@@ -113,7 +120,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 //        timer.schedule(task, 6000, 5000);
 //    }
 
-   private JMenuItem sidebarMenuItem;
+    private JMenuItem sidebarMenuItem;
     private RTextScrollPane main = null;
     private JScrollPane sidebar = null;
 
@@ -124,7 +131,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     public static String previousWindow = "";
 
 
-  private   RSyntaxTextArea textArea = new RSyntaxTextArea();
+    private RSyntaxTextArea textArea = new RSyntaxTextArea();
     //RSyntaxDocument document = (RSyntaxDocument)textArea.getDocument();
 
 
@@ -195,7 +202,10 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                 !file.isDirectory()
         ) {
             textArea.setText(FileUtils.readFileToString(file, StandardCharsets.UTF_8));
+           textArea.setCaretPosition(1);
             String ext = FilenameUtils.getExtension(file.getAbsolutePath());
+            filePath = Path.of(file.getAbsolutePath());
+            watchForChanges();
             System.out.println(ext);
             getSyntaxCompletions(ext);
         }
@@ -203,9 +213,11 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
             public void changedUpdate(DocumentEvent e) {
                 textChanged = true;
             }
+
             public void insertUpdate(DocumentEvent e) {
                 textChanged = true;
             }
+
             public void removeUpdate(DocumentEvent e) {
                 textChanged = true;
             }
@@ -655,7 +667,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
         newFile.addActionListener(e -> {
                     //  int previousframeCount = windowCount;
-                    FileCreator.chooseDirectory(folderName, folderName,getWidth(), getHeight());
+                    FileCreator.chooseDirectory(folderName, folderName, getWidth(), getHeight());
                     previousWindow = getTitle();
 
                 }
@@ -683,7 +695,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
 
                 String pathname = DarkThemeFileChooser.chooseAnyFile(true, folderName);
-                if (pathname == null){
+                if (pathname == null) {
                     return;
                 }
                 File f = new File(pathname);
@@ -717,7 +729,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
 
                 String pathname = DarkThemeFileChooser.chooseAnyFile(false, folderName);
-                if (pathname == null){
+                if (pathname == null) {
                     return;
                 }
                 File f = new File(pathname);
@@ -789,6 +801,10 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
         try {
             textArea.setText(FileUtils.readFileToString(file, StandardCharsets.UTF_8));
+            textArea.setCaretPosition(1);
+            filePath = Path.of(file.getAbsolutePath());
+            watchForChanges();
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -892,10 +908,13 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                     try {
                         File file = new File(fullPath);
                         if (!file.isDirectory()) {
+
                             FileReader fr = new FileReader(file);
                             textArea.setText(IOUtils.toString(fr));
+                            textArea.setCaretPosition(1);
                             fr.close();
-                        }
+                            filePath = Path.of(file.getAbsolutePath());
+                            watchForChanges();                        }
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     }
@@ -922,7 +941,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                         copy.setIcon(copyIcon);
                         JMenuItem newFile = new JMenuItem("New file");
                         newFile.setIcon(fileIcon);
-                        newFile.addActionListener(actionEvent -> FileCreator.chooseDirectory(fileName, folderName,getWidth(), getHeight()));
+                        newFile.addActionListener(actionEvent -> FileCreator.chooseDirectory(fileName, folderName, getWidth(), getHeight()));
                         popupMenu.add(newFile);
                         popupMenu.add(copy);
                         JMenuItem delete = new JMenuItem("Delete File");
@@ -990,8 +1009,10 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                         if (!file.isDirectory()) {
                             FileReader fr = new FileReader(file);
                             textArea.setText(IOUtils.toString(fr));
+                            textArea.setCaretPosition(1);
                             fr.close();
-                        }
+                            filePath = Path.of(file.getAbsolutePath());
+                            watchForChanges();                        }
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     }
@@ -1165,12 +1186,62 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        if (actionEvent.getActionCommand().equals("exit")) {
-            int number = JOptionPane.showConfirmDialog(null, "Are you sure you want to exit?");
-            if (number == 0) {
-                System.exit(0);
+
+        if (watchKey.isValid()) {
+            watchKey.pollEvents().stream()
+                    .filter(event -> event.context().toString().equals(filePath.getFileName()
+                            .toString()))
+                    .forEach(event -> {
+                        SwingUtilities.invokeLater(() -> {
+                            try {
+                                String contents = new String(java.nio.file.Files.readAllBytes
+                                        (filePath));
+                                int caretPosition = textArea.getCaretPosition();
+                               // System.out.println(contents);
+                                if (previousContent==null) {
+                                    previousContent = contents;
+                                }
+                                if (contents.equals(previousContent)||contents.equals(textArea.getText())){
+                                    return;
+                                }
+                                previousContent=contents;
+                                textArea.setText(contents);
+                                textArea.setCaretPosition(1);
+                                textArea.setCaretPosition(caretPosition);
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+                        });
+                    });
+
+            watchKey.reset();
+        }
+        if (actionEvent.getActionCommand()!=null) {
+            if (actionEvent.getActionCommand().equals("exit")) {
+                if (JOptionPane.showConfirmDialog(this,
+                        "Are you sure you want to close this window?", "Close Window?",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+                    System.exit(0);
+                }
             }
         }
+
+    }
+
+    private void startWatchTimer() {
+        watchTimer = new Timer(1500, this); // check for changes every 5 seconds
+        watchTimer.start();
+    }
+
+    private void watchForChanges() {
+        try {
+            watchService = FileSystems.getDefault().newWatchService();
+            watchKey = filePath.getParent().register(watchService, ENTRY_MODIFY);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        startWatchTimer();
     }
 
     @Override
@@ -1180,8 +1251,12 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
     @Override
     public void windowClosing(WindowEvent windowEvent) {
-        windowCount = windowCount - 1;
-        System.out.println("closing " + windowCount);
+        if (JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to close this window?", "Close Window?",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+            System.exit(0);
+        }
     }
 
     @Override
