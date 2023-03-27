@@ -12,7 +12,7 @@ public class DarkThemeFileChooser {
     public static String chooseAnyFile(Boolean files,String foldername) {
         try {
             setUpTheme(true);
-           // UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+           UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
         } catch (Exception e) {
             e.printStackTrace();

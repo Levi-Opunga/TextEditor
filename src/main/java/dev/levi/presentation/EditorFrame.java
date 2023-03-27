@@ -31,6 +31,8 @@ import org.fife.rsta.ac.LanguageSupportFactory;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -62,11 +64,12 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     private JLabel tab = new JLabel();
     public static int openWindowCount = 0;
 
-    public static String fileName = "./";
-    public static String folderName = "./";
-    //  TextEditorPane textArea = new TextEditorPane();
+    private Timer saveTimer ;
+
+
+    private String fileName = "./";
+    private String folderName = "./";
     public static ImageIcon openFolderIcon = Main.images.get("open");
-    //generateImageIcon(new ImageIcon("/images/open.png"));
 
     public static ImageIcon fileIcon = Main.images.get("file");
     public static ImageIcon recentIcon = Main.images.get("recent");
@@ -82,36 +85,35 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     public static ImageIcon webIcon = Main.images.get("browser");
     private static int windowCount = 0;
     private FileDaoImpl dao = dao = new FileDaoImpl();
-    List<Files> recentlyOpenedFiles = (List<Files>) dao.findAllFiles();
+   private List<Files> recentlyOpenedFiles = (List<Files>) dao.findAllFiles();
 
     public static List<String> editorWindows = new ArrayList<>();
+    private boolean textChanged;
 
 
-    public EditorFrame(Action action) {
 
-    }
 
-    {
-        java.util.Timer timer = new java.util.Timer();
+//    {
+//        java.util.Timer timer = new java.util.Timer();
+//
+//        TimerTask task = new TimerTask() {
+//            public void run() {
+//                try {
+//                    File file = new File(fileName);
+//                    if (file.exists() && !file.isDirectory()) {
+//                        FileWriter fr = new FileWriter(file);
+//                        fr.write(textArea.getText());
+//                        fr.close();
+//                    }
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//        };
+//        timer.schedule(task, 6000, 5000);
+//    }
 
-        TimerTask task = new TimerTask() {
-            public void run() {
-                try {
-                    File file = new File(fileName);
-                    if (file.exists() && !file.isDirectory()) {
-                        FileWriter fr = new FileWriter(file);
-                        fr.write(textArea.getText());
-                        fr.close();
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        };
-        timer.schedule(task, 1000, 1000);
-    }
-
-    JMenuItem sidebarMenuItem;
+   private JMenuItem sidebarMenuItem;
     private RTextScrollPane main = null;
     private JScrollPane sidebar = null;
 
@@ -122,7 +124,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     public static String previousWindow = "";
 
 
-    RSyntaxTextArea textArea = new RSyntaxTextArea();
+  private   RSyntaxTextArea textArea = new RSyntaxTextArea();
     //RSyntaxDocument document = (RSyntaxDocument)textArea.getDocument();
 
 
@@ -165,7 +167,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
     }
 
-    public void initializeView(String fileName) throws IOException {
+    private void initializeView(String fileName) throws IOException {
         // Add window listener to decrease count when the frame is closed
         addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
@@ -197,6 +199,27 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
             System.out.println(ext);
             getSyntaxCompletions(ext);
         }
+        textArea.getDocument().addDocumentListener(new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) {
+                textChanged = true;
+            }
+            public void insertUpdate(DocumentEvent e) {
+                textChanged = true;
+            }
+            public void removeUpdate(DocumentEvent e) {
+                textChanged = true;
+            }
+        });
+
+        saveTimer = new Timer(1000, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (textChanged) {
+                    saveToFile();
+                    textChanged = false;
+                }
+            }
+        });
+        saveTimer.start();
 
         int height = getSize().height;
         int width = getSize().width;
@@ -342,10 +365,13 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         JMenu settings = new JMenu("Settings");
         JMenu appTheme = new JMenu("App Theme");
         settings.add(appTheme);
+        JMenuItem system = new JMenuItem("System");
+
         JMenuItem light = new JMenuItem("Light");
         JMenuItem dark = new JMenuItem("Dark");
         appTheme.add(light);
         appTheme.add(dark);
+        appTheme.add(system);
         light.addActionListener((actionEvent -> {
             Timer timer = new Timer(1000, e -> {
                 Main.setUpTheme(false);
@@ -366,6 +392,23 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
             Timer timer = new Timer(1000, e -> {
                 Main.setUpTheme(true);
 
+                dispose();
+                try {
+                    getInstance(fileName, folderName, getWidth(), getHeight());
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
+            timer.setRepeats(false);
+            timer.start();
+        }));
+        system.addActionListener((actionEvent -> {
+            Timer timer = new Timer(1000, e -> {
+                try {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
                 dispose();
                 try {
                     getInstance(fileName, folderName, getWidth(), getHeight());
@@ -612,7 +655,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
         newFile.addActionListener(e -> {
                     //  int previousframeCount = windowCount;
-                    FileCreator.chooseDirectory(folderName, getWidth(), getHeight());
+                    FileCreator.chooseDirectory(folderName, folderName,getWidth(), getHeight());
                     previousWindow = getTitle();
 
                 }
@@ -755,7 +798,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
     }
 
-    public void setUpPanel() {
+    private void setUpPanel() {
         File file = new File(folderName);
 
 //        if (file.isDirectory()) {
@@ -879,7 +922,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                         copy.setIcon(copyIcon);
                         JMenuItem newFile = new JMenuItem("New file");
                         newFile.setIcon(fileIcon);
-                        newFile.addActionListener(actionEvent -> FileCreator.chooseDirectory(fileName, getWidth(), getHeight()));
+                        newFile.addActionListener(actionEvent -> FileCreator.chooseDirectory(fileName, folderName,getWidth(), getHeight()));
                         popupMenu.add(newFile);
                         popupMenu.add(copy);
                         JMenuItem delete = new JMenuItem("Delete File");
@@ -1105,6 +1148,19 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         Image image = imageIcon.getImage();
         image = image.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
         return new ImageIcon(image);
+    }
+
+    private void saveToFile() {
+        try {
+            File file = new File(fileName);
+            FileWriter writer = new FileWriter(file);
+            writer.write(textArea.getText());
+            writer.close();
+            System.out.println("Text saved to file.");
+        } catch (IOException ex) {
+            System.out.println("Error saving text to file.");
+            ex.printStackTrace();
+        }
     }
 
     @Override

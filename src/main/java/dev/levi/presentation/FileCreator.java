@@ -26,11 +26,12 @@ public class FileCreator extends JPanel
     private int height;
 
     TextField filename = new TextField(20);
-    String directory = EditorFrame.folderName;
+    String directory = "";
 
     JFileChooser chooser;
     String choosertitle;
     JButton saveButton = new JButton("save");
+    private String rootFolder;
     private Font uifont;
     private static JFrame frame;
 
@@ -46,10 +47,11 @@ public class FileCreator extends JPanel
         }
     }
 
-    private FileCreator(String startFolder, int width, int height) {
+    private FileCreator(String startFolder,String rootFolder, int width, int height) {
         this();
         this.width = width;
         this.height = height;
+        this.rootFolder = rootFolder;
         if (new File(startFolder).isDirectory()) {
             directory = startFolder;
         } else {
@@ -137,7 +139,7 @@ public class FileCreator extends JPanel
                 new Thread(() -> {
                     dao.createFile(new Files(0, directory, directory, System.currentTimeMillis()));
                     try {
-                        EditorFrame editorFrame = new EditorFrame(name, EditorFrame.folderName);
+                        EditorFrame editorFrame = new EditorFrame(name, rootFolder);
                         editorFrame.setSize(width, height);
                         Arrays.stream(EditorFrame.getFrames()).filter(frame1 -> frame1.getTitle().equals(EditorFrame.previousWindow)).toList().get(0).dispose();
                         frame.dispose();
@@ -174,13 +176,13 @@ public class FileCreator extends JPanel
         return new Dimension(400, 200);
     }
 
-    public static void chooseDirectory(String folderName, int width, int height) {
+    public static void chooseDirectory(String folderName,String rootFolder, int width, int height) {
         frame = new JFrame("Create File");
         frame.setUndecorated(true);
         directoryLabel.setForeground(Color.WHITE);
         fileLabel.setForeground(Color.white);
         // frame.setOpacity(.9F);
-        FileCreator panel = new FileCreator(folderName, width, height);
+        FileCreator panel = new FileCreator(folderName, rootFolder,width, height);
         Shape shape = new RoundRectangle2D.Double(0, 0, panel.getPreferredSize().width, panel.getPreferredSize().getHeight(), 20, 20);
         frame.setShape(shape);
         frame.setSize(panel.getPreferredSize());
