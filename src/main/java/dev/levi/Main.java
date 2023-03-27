@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import dev.levi.data.FileDaoImpl;
 import dev.levi.domain.Files;
+import dev.levi.presentation.App;
 import dev.levi.presentation.EditorFrame;
 import dev.levi.utils.FileEdit;
 
@@ -88,7 +89,16 @@ public class Main {
         last = (List<Files>) dao.findAllFiles();
 
         try {
-            EditorFrame frame = new EditorFrame(last.get(0).getName(),last.get(0).getPath());
+
+            String name = last.get(0).getName();
+            String path = last.get(0).getPath();
+            if(new File(name).exists()&&new File(path).isDirectory()){
+                EditorFrame frame = new EditorFrame(name, path);
+
+            }else {
+                App app = new App();
+            }
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

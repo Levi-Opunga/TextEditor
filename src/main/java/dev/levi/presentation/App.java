@@ -32,16 +32,16 @@ public class App extends JFrame {
     private JMenu edit = new JMenu();
     private JMenu help = new JMenu();
     private JMenu viewMenu = new JMenu();
-    private JPanel secondPanel = new JPanel();
+  //  private JPanel secondPanel = new JPanel();
     private JPanel panel = new JPanel();
     private String fileName = "";
 
     private JEditorPane jEditorPane = new JEditorPane();
 
 
-    private JScrollPane scrollPane;
+    private JPanel secondPanel =new JPanel();
 
-    private App() throws HeadlessException, IOException {
+    public App() throws HeadlessException, IOException {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(600, 600);
         setLayout(null);
@@ -56,15 +56,15 @@ public class App extends JFrame {
         panel.setSize((int) (width * .2), height);
         HTMLDocument document = new HTMLDocument();
         //scrollPane.setSize(new Dimension((int) (width*.8),height));
-        scrollPane = new JScrollPane(jEditorPane);
-        scrollPane.setBounds((int) (width * .2), 0, (int) (width * .8), height);
+        secondPanel.setBackground(Color.gray);
+        secondPanel.setBounds((int) (width * .2), 0, (int) (width * .8), height);
         panel.setBounds(0, 0, (int) (width * .2), height);
         resizeEvent();
 
 
-        scrollPane.add(jEditorPane);
+        secondPanel.add(jEditorPane);
         panel.setBackground(Color.BLUE);
-        getContentPane().add(scrollPane);
+        getContentPane().add(secondPanel);
         //     add(panel);
 
 //        getContentPane().setBackground(Color.BLACK);
@@ -75,7 +75,7 @@ public class App extends JFrame {
 
         setJMenuBar(bar);
         setVisible(true);
-        new EditorFrame().initializeView("");
+       // new EditorFrame().initializeView("");
     }
 
     private void resizeEvent() {
@@ -86,8 +86,8 @@ public class App extends JFrame {
                 int height = e.getComponent().getSize().height;
                 int width = e.getComponent().getSize().width;
                 panel.setSize((int) (width * .2), height);
-                scrollPane = new JScrollPane(jEditorPane);
-                scrollPane.setBounds((int) (width * .2), 0, (int) (width * .8), height);
+
+                secondPanel.setBounds((int) (width * .2), 0, (int) (width * .8), height);
                 panel.setBounds(0, 0, (int) (width * .2), height);
             }
 

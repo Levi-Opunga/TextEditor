@@ -149,7 +149,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         this.setTitle("Text Editor " + (openWindowCount + 1));
         editorWindows.add(getTitle());
 
-        System.out.println("df6" + fileName);
+        System.out.println("constructor with file " + fileName);
         initializeView(fileName);
         resizeEvent();
         openWindowCount++;
@@ -639,7 +639,11 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                 // DarkThemeFileChooser fc = new DarkThemeFileChooser();
 
 
-                File f = new File(DarkThemeFileChooser.chooseAnyFile(true, folderName));
+                String pathname = DarkThemeFileChooser.chooseAnyFile(true, folderName);
+                if (pathname == null){
+                    return;
+                }
+                File f = new File(pathname);
 
                 fileName = f.getPath();
                 folderName = f.getParent();
@@ -669,7 +673,11 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                 // DarkThemeFileChooser fc = new DarkThemeFileChooser();
 
 
-                File f = new File(DarkThemeFileChooser.chooseAnyFile(false, folderName));
+                String pathname = DarkThemeFileChooser.chooseAnyFile(true, folderName);
+                if (pathname == null){
+                    return;
+                }
+                File f = new File(pathname);
                 if (f.getPath() == fileName) {
                     return;
                 }
