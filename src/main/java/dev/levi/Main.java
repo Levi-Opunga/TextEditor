@@ -97,8 +97,9 @@ public class Main {
                 EditorFrame frame = new EditorFrame(name, path);
 
             }else {
-                App app = new App();
+                EditorFrame frame = new EditorFrame(System.getenv().get("HOME"), System.getenv().get("HOME"));
             }
+         //   EditorFrame frame = new EditorFrame(System.getenv().get("HOME"), System.getenv().get("HOME"));
 
         } catch (IOException e) {
             throw new RuntimeException(e);

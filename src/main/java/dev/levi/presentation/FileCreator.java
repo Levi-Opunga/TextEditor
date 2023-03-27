@@ -1,5 +1,6 @@
 package dev.levi.presentation;
 
+import dev.levi.Main;
 import dev.levi.data.FileDao;
 import dev.levi.data.FileDaoImpl;
 import dev.levi.domain.Files;
@@ -18,7 +19,8 @@ import java.util.Arrays;
 public class FileCreator extends JPanel
         implements ActionListener {
     private final FileDao dao = new FileDaoImpl();
-    JButton go;
+    JButton anotherDir;
+    JButton cancelButton = new JButton("Cancel") ;
 
     static JLabel directoryLabel = new JLabel("Select folder to create");
     static JLabel fileLabel = new JLabel("File Name");
@@ -30,7 +32,7 @@ public class FileCreator extends JPanel
 
     JFileChooser chooser;
     String choosertitle;
-    JButton saveButton = new JButton("save");
+    JButton saveButton = new JButton("Save");
     private String rootFolder;
     private Font uifont;
     private static JFrame frame;
@@ -49,6 +51,7 @@ public class FileCreator extends JPanel
 
     private FileCreator(String startFolder,String rootFolder, int width, int height) {
         this();
+        Main.setUpTheme(true);
         this.width = width;
         this.height = height;
         this.rootFolder = rootFolder;
@@ -66,15 +69,15 @@ public class FileCreator extends JPanel
         setLayout(null);
         //setBackground(new Color(96,96,96));
 
-        go = new JButton("...");
+        anotherDir = new JButton("...");
         // go.setBackground(Color.white);
-        go.setFocusable(false);
+        anotherDir.setFocusable(false);
         saveButton.setFocusable(false);
         saveButton.setBorderPainted(false);
         // saveButton.setBackground(Color.white);
 
 
-        go.addActionListener(e -> {
+        anotherDir.addActionListener(e -> {
 
             String pathname = DarkThemeFileChooser.chooseAnyFile(false, directory);
             if (pathname == null){
@@ -83,12 +86,24 @@ public class FileCreator extends JPanel
             directory = pathname;
         });
         directoryLabel.setBounds(20, 20, 300, 40);
-        go.setBounds(330, 20, 50, 40);
+        anotherDir.setBounds(330, 20, 50, 40);
         fileLabel.setBounds(60, 80, 100, 40);
         filename.setBounds(200, 80, 160, 40);
-        saveButton.setBounds(160, 140, 80, 40);
-        filename.setPreferredSize(new Dimension(200, 30)); // Set preferred size
+        filename.setBackground(frame.getBackground());
+        filename.setForeground(Color.white);
+        saveButton.setBounds(200, 140, 80, 40);
+        saveButton.setBackground(Color.green);
+        cancelButton.setBounds(100, 140, 80, 40);
 
+        saveButton.setForeground(Color.white);
+        saveButton.setBackground(new Color(0x57ACF4));
+
+        filename.setPreferredSize(new Dimension(200, 30)); // Set preferred size
+cancelButton.addActionListener(new ActionListener() {
+    public void actionPerformed(ActionEvent event){
+        frame.dispose();
+    }
+});
         saveButton.addActionListener(e -> {
             if (directory != "" && filename.getText().length() > 1) {
                 String name = directory + "/" + filename.getText();
@@ -160,10 +175,11 @@ public class FileCreator extends JPanel
 
 
         add(directoryLabel);
-        add(go);
+        add(anotherDir);
         add(fileLabel);
         add(filename);
         add(saveButton);
+        add(cancelButton);
 
     }
 
