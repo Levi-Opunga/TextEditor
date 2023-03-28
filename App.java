@@ -12,7 +12,11 @@ import javax.swing.text.html.*;
 
 public class SwingHTMLBrowser extends JFrame implements ActionListener, HyperlinkListener {
     private JTextField addressBar;
-    private JEditorPane pane;
+
+   Pane pane;
+   the other day i was walking dpwn the road the i realized how much i missed being at home 
+   so i decided to head back home suddenly it started raining i didnt know what to do so decided not to do anything
+   i hate water spilling on me so yes it was no the most pkeasant feeling in the world
 
     public SwingHTMLBrowser(String initial){
         this();

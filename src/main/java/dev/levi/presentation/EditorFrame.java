@@ -186,7 +186,14 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         });
 
         panel.setBackground(Color.black);
-
+        if (fileName.endsWith(".jar")
+                || fileName.endsWith(".zip")
+                || fileName.endsWith(".tar.xz")
+                || fileName.endsWith(".7z")
+                || fileName.endsWith(".tar.gz")
+                || fileName.endsWith(".tar")) {
+            return;
+        }
         //TODO() recent / new
         File file = new File(fileName);
 //        if (fileName == "000000") {
@@ -202,7 +209,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                 !file.isDirectory()
         ) {
             textArea.setText(FileUtils.readFileToString(file, StandardCharsets.UTF_8));
-           textArea.setCaretPosition(1);
+            textArea.setCaretPosition(0);
             String ext = FilenameUtils.getExtension(file.getAbsolutePath());
             filePath = Path.of(file.getAbsolutePath());
             watchForChanges();
@@ -223,7 +230,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
             }
         });
 
-        saveTimer = new Timer(1000, new ActionListener() {
+        saveTimer = new Timer(0, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (textChanged) {
                     saveToFile();
@@ -572,6 +579,11 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
             int height = getHeight();
             resizeHelper(height, width);
         });
+        JMenuItem item = new JMenuItem("Presentation Mode");
+        item.addActionListener((e) -> {
+            presentationMode();
+        });
+        view.add(item);
         view.add(sidebarMenuItem);
         JMenuItem newFile = new JMenuItem("New file");
         newFile.setIcon(fileIcon);
@@ -795,21 +807,20 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     }
 
 
-    private void presentationMode(String javaFile) {
+    private void presentationMode() {
 
-        File file = new File(javaFile);
+//       // File file = new File(javaFile);
+//
+//        try {
+//           // textArea.setText(FileUtils.readFileToString(file, StandardCharsets.UTF_8));
+//            filePath = Path.of(file.getAbsolutePath());
+//            watchForChanges();
+//
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 
-        try {
-            textArea.setText(FileUtils.readFileToString(file, StandardCharsets.UTF_8));
-            textArea.setCaretPosition(1);
-            filePath = Path.of(file.getAbsolutePath());
-            watchForChanges();
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        setSize(10000, 10000);
+        textArea.setSize(10000, 10000);
 
 
     }
@@ -905,16 +916,27 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                     for (int i = 1; i < e.getPath().getPath().length; i++) {
                         fullPath = fullPath + "/" + e.getPath().getPath()[i].toString();
                     }
+                    if (fullPath.endsWith(".zip") || fullPath.endsWith(".jar")
+                            || fullPath.endsWith(".tar.xz")
+                            || fullPath.endsWith(".7z")
+                            || fullPath.endsWith(".tar.gz")
+                            || fullPath.endsWith(".tar")) {
+                        return;
+                    }
                     try {
+
                         File file = new File(fullPath);
-                        if (!file.isDirectory()) {
+                        if (
+                                !file.isDirectory()
+                        ) {
 
                             FileReader fr = new FileReader(file);
                             textArea.setText(IOUtils.toString(fr));
-                            textArea.setCaretPosition(1);
+                            textArea.setCaretPosition(0);
                             fr.close();
                             filePath = Path.of(file.getAbsolutePath());
-                            watchForChanges();                        }
+                            watchForChanges();
+                        }
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     }
@@ -1004,22 +1026,33 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                     for (int i = 0; i < e.getPath().getPath().length; i++) {
                         fullPath = fullPath + "/" + e.getPath().getPath()[i].toString();
                     }
+
+                    if (fullPath.endsWith(".jar")
+                            || fullPath.endsWith(".zip")
+                            || fullPath.endsWith(".tar.xz")
+                            || fullPath.endsWith(".7z")
+                            || fullPath.endsWith(".tar.gz")
+                            || fullPath.endsWith(".tar")) {
+                        return;
+                    }
                     try {
                         File file = new File(fullPath);
-                        if (!file.isDirectory()) {
+                        if (
+                                !file.isDirectory()
+                        ) {
                             FileReader fr = new FileReader(file);
                             textArea.setText(IOUtils.toString(fr));
-                            textArea.setCaretPosition(1);
+                            textArea.setCaretPosition(0);
                             fr.close();
                             filePath = Path.of(file.getAbsolutePath());
-                            watchForChanges();                        }
+                            watchForChanges();
+                        }
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     }
                     String ext = FilenameUtils.getExtension(fullPath);
                     System.out.println(ext);
                     getSyntaxCompletions(ext);
-                    // File file = new File(e.getPath().toString());
 
                     dao.createFile(new Files(fullPath, folderName));
                     dao.findAllFiles().forEach(System.out::println);
@@ -1197,16 +1230,17 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
                                 String contents = new String(java.nio.file.Files.readAllBytes
                                         (filePath));
                                 int caretPosition = textArea.getCaretPosition();
-                               // System.out.println(contents);
-                                if (previousContent==null) {
+                               //  System.out.println(contents);
+                                if (previousContent == null) {
                                     previousContent = contents;
                                 }
-                                if (contents.equals(previousContent)||contents.equals(textArea.getText())){
+                                if (contents.equals(previousContent) || contents.equals(textArea.getText())) {
                                     return;
                                 }
-                                previousContent=contents;
+                                int previous = textArea.getCaretPosition();
+                                previousContent = contents;
                                 textArea.setText(contents);
-                                textArea.setCaretPosition(1);
+                                textArea.setCaretPosition(previous);
                                 textArea.setCaretPosition(caretPosition);
                             } catch (IOException e1) {
                                 e1.printStackTrace();
@@ -1216,12 +1250,12 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
 
             watchKey.reset();
         }
-        if (actionEvent.getActionCommand()!=null) {
+        if (actionEvent.getActionCommand() != null) {
             if (actionEvent.getActionCommand().equals("exit")) {
                 if (JOptionPane.showConfirmDialog(this,
                         "Are you sure you want to close this window?", "Close Window?",
                         JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+                        JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                     System.exit(0);
                 }
             }
@@ -1230,7 +1264,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
     }
 
     private void startWatchTimer() {
-        watchTimer = new Timer(1500, this); // check for changes every 5 seconds
+        watchTimer = new Timer(6000, this); // check for changes every 5 seconds
         watchTimer.start();
     }
 
@@ -1254,7 +1288,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         if (JOptionPane.showConfirmDialog(this,
                 "Are you sure you want to close this window?", "Close Window?",
                 JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+                JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
             System.exit(0);
         }
     }
