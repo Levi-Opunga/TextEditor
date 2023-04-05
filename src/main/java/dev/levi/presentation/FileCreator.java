@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 
 public class FileCreator extends JPanel
@@ -38,7 +39,7 @@ public class FileCreator extends JPanel
     private static JFrame frame;
 
     {
-        File font_file = new File("./Fonts/DroidSans.ttf");
+        File font_file = new File("Fonts/DroidSans.ttf");
         try {
             uifont = Font.createFont(Font.TRUETYPE_FONT, font_file);
             uifont = uifont.deriveFont(15f);
@@ -156,7 +157,7 @@ cancelButton.addActionListener(new ActionListener() {
                     try {
                         EditorFrame editorFrame = new EditorFrame(name, rootFolder);
                         editorFrame.setSize(width, height);
-                        Arrays.stream(EditorFrame.getFrames()).filter(frame1 -> frame1.getTitle().equals(EditorFrame.previousWindow)).toList().get(0).dispose();
+                        Arrays.stream(EditorFrame.getFrames()).filter(frame1 -> frame1.getTitle().equals(EditorFrame.previousWindow)).collect(Collectors.toList()).get(0).dispose();
                         frame.dispose();
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);

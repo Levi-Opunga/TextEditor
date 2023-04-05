@@ -53,6 +53,7 @@ import java.util.List;
 
 
 import static dev.levi.Main.generateFonts;
+import static dev.levi.Main.jetbrains;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public class EditorFrame extends JFrame implements ActionListener, WindowListener {
@@ -252,7 +253,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         textArea.setCodeFoldingEnabled(true);
 
 
-        textArea.setFont(Main.generateFonts(Main.droid, 20F));
+        textArea.setFont(Main.droid);
         try {
             Theme theme = Theme.load(getClass().getResourceAsStream(
                     "/org/fife/ui/rsyntaxtextarea/themes/monokai.xml"));
@@ -268,7 +269,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         main.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         //  sidebar.setSize((int) (width * .2), height);
         tab.setBounds((int) (width * .2), 0, (int) (width * .8), 30);
-        tab.setFont(Main.generateFonts(Main.jetbrains, 12f));
+        tab.setFont(jetbrains);
         tab.setText(fileName);
         tab.setIcon(fileIcon);
         sidebar.setBounds(0, 0, (int) (width * .2), height);
@@ -377,7 +378,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         Arrays.stream(menus).forEach(item ->
                 {
                     bar.add(item);
-                    item.setFont(generateFonts(Main.droid, 15f));
+                    item.setFont(Main.droid);
                 }
         );
 

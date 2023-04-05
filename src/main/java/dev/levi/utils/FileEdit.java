@@ -87,7 +87,7 @@ public class FileEdit {
 //            }
 //            ClassLoader classLoader = Main.class.getClassLoader();
 //            URL resourceUrl = classLoader.getResource(path);
-            File resourceFolder = new File(path);
+            File resourceFolder = new File("src/main/resources/"+path);
             File[] files = resourceFolder.listFiles();
             for (File file : files) {
                 if (file.isFile()) {
@@ -97,6 +97,14 @@ public class FileEdit {
             }
 
         }
+//        File resourceFolder = new File(path);
+//        File[] files = resourceFolder.listFiles();
+//        for (File file : files) {
+//            if (file.isFile()) {
+//                // System.out.println(file.getPath());
+//                list.add("./"+file.getPath());
+//            }
+//        }
         return list;
     }
 

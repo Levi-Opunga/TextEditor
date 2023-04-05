@@ -12,7 +12,7 @@ public class FileDaoImpl implements FileDao {
 
     static {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:h2:./datatbase/db", "sa", "");
+            Connection conn = DriverManager.getConnection("jdbc:h2:./database/db", "sa", "");
 
             //conn=   DriverManager.getConnection ("jdbc:h2:./src/main/resources/db", "sa","");
             Statement stmt = null;
@@ -38,7 +38,7 @@ public class FileDaoImpl implements FileDao {
     @Override
     public void createFile(Files file) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:h2:./datatbase/db", "sa", "");
+            Connection conn = DriverManager.getConnection("jdbc:h2:./database/db", "sa", "");
 
             PreparedStatement statement = conn.prepareStatement("INSERT INTO FILES (name,path,time) VALUES (?, ?,?)");
 //            statement.setInt(1, 0);
@@ -57,7 +57,7 @@ public class FileDaoImpl implements FileDao {
     public Iterable<Files> findAllFiles() {
         List<Files> list = new ArrayList<Files>();
         try {
-            Connection conn = DriverManager.getConnection("jdbc:h2:./datatbase/db", "sa", "");
+            Connection conn = DriverManager.getConnection("jdbc:h2:./database/db", "sa", "");
 
             Statement statement = conn.createStatement();
             String sql = "SELECT * FROM FILES order by time DESC LIMIT 8;";
@@ -81,7 +81,7 @@ public class FileDaoImpl implements FileDao {
     @Override
     public void updateFile(Files file) {
         try {
-            Connection conn=   DriverManager.getConnection ("jdbc:h2:./datatbase/db", "sa","");
+            Connection conn=   DriverManager.getConnection ("jdbc:h2:./database/db", "sa","");
 
             PreparedStatement statement = conn.prepareStatement(
                     "UPDATE FILES SET name=? ,time =? " +

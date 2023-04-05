@@ -45,7 +45,7 @@ public class FileTree extends JTree
             super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
 
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-setFont(Main.generateFonts(Main.droid,12f));
+setFont(Main.droid);
 
             if (selected) {
                 setBackground(backgroundSelectionColor);

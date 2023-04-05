@@ -4,7 +4,6 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import dev.levi.data.FileDaoImpl;
 import dev.levi.domain.Files;
-import dev.levi.presentation.App;
 import dev.levi.presentation.EditorFrame;
 import dev.levi.utils.FileEdit;
 
@@ -13,16 +12,28 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
 
 public class Main {
-    public static File droid = new File("./Fonts/DroidSans.ttf");
-    public static File jetbrains = new File("./Fonts/JetBrains Mono Bold Nerd Font Complete.ttf");
-    public static File fira = new File("./Fonts/Fira Code Regular Nerd Font Complete Mono.ttf");
-    public static File hack = new File("./Fonts/Hack Bold Nerd Font Complete.ttf");
-    private static Font uifont;
+    public static Font droid;
+
+    public static Font fira;
+  //  public static InputStream jetbrainsIS = Main.class.getClassLoader().getResourceAsStream("Fonts/JetBrains Mono Bold Nerd Font Complete.ttf");
+  public static   Font jetbrains;
+    //  public static File jetbrains = new File("./Fonts/JetBrains Mono Bold Nerd Font Complete.ttf");
+    //public static Font hack = generateFontClassLoader("Fonts/Hack Bold Nerd Font Complete.ttf");
+
+    static {
+//        droid =  generateFonts(new File("./Fonts/DroidSans.ttf"),12f);//generateFontClassLoader("./Fonts/DroidSans.ttf");
+//        fira = generateFonts(new File("./Fonts/Fira Code Regular Nerd Font Complete Mono.ttf"),12f);//generateFontClassLoader("./Fonts/Fira Code Regular Nerd Font Complete Mono.ttf");
+//        jetbrains = generateFonts(new File("./Fonts/JetBrains Mono Bold Nerd Font Complete.ttf"),12f);//generateFontClassLoader("./Fonts/JetBrains Mono Bold Nerd Font Complete.ttf");
+        droid = generateFontClassLoader("Fonts/DroidSans.ttf");
+        fira = generateFontClassLoader("Fonts/Fira Code Regular Nerd Font Complete Mono.ttf");
+        jetbrains = generateFontClassLoader("Fonts/JetBrains Mono Bold Nerd Font Complete.ttf");
+    }
 
 
     public static List<String> list ;
@@ -43,9 +54,12 @@ public class Main {
                             //
 
                             if (icon.endsWith("png")){
+                                System.out.println(list);
+                                icon = icon.replace("src/main/resources/","");
                                 System.out.println( icon);
-                                Image image = ImageIO.read(Main.class.getClassLoader().getResourceAsStream(icon));
-                               // Image image = ImageIO.read(new File(icon));
+
+                               Image image = ImageIO.read(Main.class.getClassLoader().getResourceAsStream(icon));
+                        //      Image image = ImageIO.read(new File(icon));
 
                                 if (System.getProperty("os.name").toLowerCase().contains("linux")) {
                                     icon = icon.replace("images/", "");
@@ -129,13 +143,27 @@ public class Main {
             }
         }
 
-        uifont = generateFonts(fira, 15f);
         UIManager.put("ScrollPane.horizontalScrollBarPolicy", ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        UIManager.put("REditorPane.font", generateFonts(jetbrains, 17f));
-        UIManager.put("MenuItem.font", generateFonts(fira, 12f));
-        UIManager.put("Menu.font", generateFonts(droid, 13f));
+        UIManager.put("REditorPane.font", jetbrains);
+        UIManager.put("MenuItem.font", fira);
+        UIManager.put("Menu.font",droid);
         UIManager.put("Button.border", null);
 //        DarkThemeFileChooser.setColors();
+    }
+    public static Font generateFontClassLoader(String url) {
+        System.out.println(url);
+        InputStream inputStream = Main.class.getClassLoader().getResourceAsStream(url);
+        Font font ;
+
+        try {
+            font = Font.createFont(Font.TRUETYPE_FONT,inputStream);
+            font = font.deriveFont(12f);
+        } catch (FontFormatException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return font;
     }
 
     public static Font generateFonts(File fontFile, Float size) {
