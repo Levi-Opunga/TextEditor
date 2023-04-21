@@ -253,7 +253,7 @@ public class EditorFrame extends JFrame implements ActionListener, WindowListene
         textArea.setCodeFoldingEnabled(true);
 
 
-        textArea.setFont(Main.droid);
+        textArea.setFont(jetbrains);
         try {
             Theme theme = Theme.load(getClass().getResourceAsStream(
                     "/org/fife/ui/rsyntaxtextarea/themes/monokai.xml"));

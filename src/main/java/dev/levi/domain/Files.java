@@ -1,7 +1,6 @@
 package dev.levi.domain;
 
 public class Files {
-
     private int id;
     private String name;
     private  String path;
@@ -34,6 +33,8 @@ public class Files {
     public Long getTime() {
         return time;
     }
+
+
 
     public void setTime(Long time) {
         this.time = time;

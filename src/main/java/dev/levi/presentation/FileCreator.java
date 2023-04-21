@@ -40,14 +40,9 @@ public class FileCreator extends JPanel
 
     {
         File font_file = new File("Fonts/DroidSans.ttf");
-        try {
-            uifont = Font.createFont(Font.TRUETYPE_FONT, font_file);
-            uifont = uifont.deriveFont(15f);
-            UIManager.put("Label.font", uifont);
-            UIManager.put("TextField.font", uifont);
-        } catch (FontFormatException | IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        UIManager.put("Label.font", Main.droid);
+        UIManager.put("TextField.font", Main.droid);
     }
 
     private FileCreator(String startFolder,String rootFolder, int width, int height) {

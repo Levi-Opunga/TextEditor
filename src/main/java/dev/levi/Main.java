@@ -6,6 +6,7 @@ import dev.levi.data.FileDaoImpl;
 import dev.levi.domain.Files;
 import dev.levi.presentation.EditorFrame;
 import dev.levi.utils.FileEdit;
+import org.h2.expression.UnaryOperation;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -14,8 +15,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.util.*;
 import java.util.List;
+import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 public class Main {
     public static Font droid;
@@ -42,6 +46,12 @@ public class Main {
 
     static {
         try {
+            List<String> list = new ArrayList<String>();
+            String decodedPath = URLDecoder.decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8");
+            System.out.println(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+            System.out.println("decoded path "+decodedPath);
+            File jarFile = new File(decodedPath);
+
             list = FileEdit.copyFromJar("images");
             for (int i=1; i<list.size(); i++) {
                 String icon = list.get(i);
@@ -96,8 +106,10 @@ public class Main {
     public static void main(String[] args)  {
         FileDaoImpl dao = new FileDaoImpl();
         List<Files> last = (List<Files>) dao.findAllFiles();
+
         if (last.size() == 0) {
-            dao.createFile(new Files(0, "./", "./", System.currentTimeMillis()));
+            File file  = new File("./");
+            dao.createFile(new Files(0, file.getAbsolutePath(), file.getAbsolutePath(), System.currentTimeMillis()));
         }
         setUpTheme(true);
         last = (List<Files>) dao.findAllFiles();
@@ -142,10 +154,12 @@ public class Main {
                 throw new RuntimeException(e);
             }
         }
-
+        UIManager.put("Label.font", Main.droid);
+        UIManager.put("TextField.font", Main.droid);
+        UIManager.put("RSyntaxTextArea.font", Main.jetbrains);
         UIManager.put("ScrollPane.horizontalScrollBarPolicy", ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         UIManager.put("REditorPane.font", jetbrains);
-        UIManager.put("MenuItem.font", fira);
+        UIManager.put("MenuItem.font", droid);
         UIManager.put("Menu.font",droid);
         UIManager.put("Button.border", null);
 //        DarkThemeFileChooser.setColors();
@@ -154,8 +168,8 @@ public class Main {
         System.out.println(url);
         InputStream inputStream = Main.class.getClassLoader().getResourceAsStream(url);
         Font font ;
-
         try {
+
             font = Font.createFont(Font.TRUETYPE_FONT,inputStream);
             font = font.deriveFont(12f);
         } catch (FontFormatException e) {

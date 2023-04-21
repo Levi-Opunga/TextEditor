@@ -7,6 +7,7 @@ import java.awt.datatransfer.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -14,7 +15,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class FileEdit {
-    static final File jarFile = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 
     public static void copyFileToClipboard(File file) {
         if (file != null) {
@@ -50,7 +50,9 @@ public class FileEdit {
 
     public static List<String> copyFromJar(String path) throws IOException, URISyntaxException {
             List<String> list = new ArrayList<String>();
+        String decodedPath = URLDecoder.decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8");
 
+        File jarFile = new File(decodedPath);
 
         if(jarFile.isFile()) {  // Run with JAR file
             final JarFile jar = new JarFile(jarFile);
