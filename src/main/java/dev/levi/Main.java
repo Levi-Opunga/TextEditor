@@ -66,6 +66,7 @@ public class Main {
                             if (icon.endsWith("png")){
                                 System.out.println(list);
                                 icon = icon.replace("src/main/resources/","");
+                                icon = icon.replace("src\\main\\resources\\","");
                                 System.out.println( icon);
 
                                Image image = ImageIO.read(Main.class.getClassLoader().getResourceAsStream(icon));
@@ -77,9 +78,11 @@ public class Main {
                                     icon = icon.replace("./", "");
                                 } else if (System.getProperty("os.name").toLowerCase().contains("windows")) {
                                     icon = icon.replace("images\\", "");
+                                    icon = icon.replace("images/", "");
                                     icon = icon.replace(".png", "");
                                     icon = icon.replace(".", "");
                                     icon = icon.replace("/", "");
+                                    icon = icon.replace("\\", "");
                                 }
                                 System.out.println(icon);
                                 images.put(icon,generateImageIcon(image));
