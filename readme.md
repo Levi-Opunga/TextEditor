@@ -26,4 +26,4 @@ cd into the Source code directory
 
 
 ## Preview 
-![Alt text](./static/myeditor.png)
+![Image of the editor](./static/myeditor.png)
