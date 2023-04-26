@@ -25,3 +25,5 @@ cd into the Source code directory
       To reset recent file data delete the database folder generated in the Executable jar directory
 
 
+## Preview 
+![Alt text](./static/myeditor.png)
