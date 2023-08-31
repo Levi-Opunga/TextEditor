@@ -33,7 +33,7 @@ jobs:
     - name: SAY seCRET
       run: |
          echo ${{secrets.SCRT}}
-         echo ${{secret.SCRT}} >> secret
+         echo ${{secrets.SCRT}} >> secret
          echo $(cat secret)
          echo 'more stuff' >> secret
          echo $(cat secret)
