@@ -32,8 +32,8 @@ jobs:
         
     - name: SAY seCRET
       run: |
-         echo ${{secrets.SCRT}}
-         echo "${{secrets.SCRT}}"
+         echo ${{ secrets.SCRT }}
+         echo "${{ secrets.SCRT }}"
          echo ${{secrets.MADEUP}}
          echo "${{secrets.MADEUP}}"
          echo ${{secrets.SCRT}} >> secret
