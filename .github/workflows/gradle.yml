@@ -40,6 +40,8 @@ jobs:
     - name : List
       run : |
         ssh -p '60025' 'realken@41.139.205.251' "pm2 list"
+        rsync -avz --progress -e "ssh -p 60025" ./src realken@41.139.205.251:/var/crap --rsync-path="sudo rsync"
+
 
       
     - name: Build with Gradle
