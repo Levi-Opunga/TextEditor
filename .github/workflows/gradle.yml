@@ -30,13 +30,12 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         
-    - name: SAY seCRET
-      run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
-          echo $(cat ~/.ssh/id_rsa)
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
+      with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          name: id_rsa 
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
 
       
     - name: Build with Gradle
