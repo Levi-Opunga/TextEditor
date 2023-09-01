@@ -36,6 +36,10 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           name: id_rsa 
           known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+          
+    - name : List
+      run : |
+        ssh -p '60025' 'realken@41.139.205.251' "pm2 list"
 
       
     - name: Build with Gradle
